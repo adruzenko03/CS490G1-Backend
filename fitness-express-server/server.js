@@ -11,7 +11,7 @@ app.post('/signup', (req, res) => {
   console.log(req.body);
 
   // Send back a dummy response
-  res.status(201).json({ message: 'User registered successfully!', user: req.body });
+  res.status(200).json({ message: 'User registered successfully!', user: req.body });
 });
 
 app.post('/coach-survey', (req, res) => {

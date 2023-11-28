@@ -15,16 +15,19 @@ export default class LogicService {
 
     }
     signup(info,callback){
+        console.log("info , " , info);
         this.dataMod.checkUser(info.email,(res)=>{
             if(res.length==0){
-                if(info.role==='client')
-                    this.dataMod.signupClient(info,()=>{
-                        callback(true)
-                })
-                else if (info.role==='coach')
-                    this.dataMod.signupCoach(info, ()=>{
-                        callback(true)
-                })
+                if(info.role==='client'){
+                    this.dataMod.signupClient(info,(isSuccess, message, userId)=>{
+                        callback(isSuccess, message, userId);
+                    });
+                }
+                else if (info.role==='coach'){
+                    this.dataMod.signupCoach(info, (isSuccess, message, userId)=>{
+                        callback(isSuccess, message, userId);
+                    });
+                }
             }
             else
                 callback(false)

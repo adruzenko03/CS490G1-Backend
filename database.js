@@ -29,18 +29,50 @@ export default class DatabaseService {
         });
     }    
     checkUser(email,callback){
-        this.connection.query(`SELECT * FROM users WHERE 'email='${email}`,(err,res)=>{
+        this.connection.query(`SELECT * FROM users WHERE email='${email}'`,(err,res)=>{
             callback(res)
-        })
+        });
     }
-    signupCoach(){
-        this.connection.query(``,(err,res)=>{
-            callback()
-        })
+    signupCoach(info, callback) {
+        console.log(info);
+        const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const values = [info.firstName, info.lastName, info.email, info.password, info.phoneNumber, info.streetAddress, info.city, info.state, info.zipCode, info.role];
+
+        this.connection.query(query, values, (err, results) => {
+            if (err) {
+                callback(false, err.message, null);
+            } else {
+                console.log(results.insertId);
+                callback(true, 'Signup Coach successful', results.insertId);
+            }
+        });
     }
-    signupClient(){
-        this.connection.query(``,(err,res)=>{
-            callback()
-        })
+    signupClient(info, callback) {
+        console.log(info);
+        const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const values = [info.firstName, info.lastName, info.email, info.password, info.phoneNumber, info.streetAddress, info.city, info.state, info.zipCode, info.role];
+    
+        this.connection.query(query, values, (err, results) => {
+            if (err) {
+                callback(false, err.message);
+            } else {
+                callback(true, 'Signup Client successful');
+            }
+        });
+    }
+    
+    insertCoachSurvey(surveyData, callback) {
+        const query = `INSERT INTO coach_survey (user_id, experience, city, state, cost) VALUES (?, ?, ?, ?, ?)`;
+        console.log("Query ", surveyData);
+        const values = [surveyData.userID, surveyData.experience, surveyData.city, surveyData.state, surveyData.cost];
+    
+        this.connection.query(query, values, (err, results) => {
+            if (err) {
+                callback(false, err.message);
+            } else {
+                // If the insert is successful, send back a success message.
+                callback(true, 'Survey data inserted successfully', surveyData);
+            }
+        });
     }
 }

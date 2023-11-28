@@ -7,17 +7,27 @@ export default class DatabaseService {
             user     : 'root',
             password : process.env.DB_PASS,
             database : 'fitness'
-          })
-          this.connection.connect();
-          this.connection.query('SELECT 1 + 1 AS solution', (err,res)=>{
-            console.log("Successful Database Connection")
-          })
+        });
+        this.connection.connect(err => {
+            if (err) {
+              console.error('Error connecting to the database:', err);
+              return;
+            }
+            console.log('Database connection established');
+        });
     }
-    login(username,password,callback){
-        this.connection.query(`SELECT * FROM users WHERE email='${username}' and password='${password}'`,(err,res)=>{
-                callback(res);
-        })
-    }
+    login(username, password, callback) {
+        this.connection.query(`SELECT * FROM users WHERE email='${username}' and password='${password}'`, (err, res) => {
+            if (err) {
+                console.error("Database error:", err);
+                callback([]); 
+                return;
+            }
+            const userData = res[0];
+            console.log("Database response!:", userData);
+            callback(userData);
+        });
+    }    
     checkUser(email,callback){
         this.connection.query(`SELECT * FROM users WHERE 'email='${email}`,(err,res)=>{
             callback(res)

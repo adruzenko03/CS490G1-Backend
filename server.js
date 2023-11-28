@@ -17,15 +17,15 @@ app.post('/signup',(req,res)=>{
     res.status(200).send({
         ok: true
      });
-})
+});
 app.post('/login',async (req,res)=>{
-    logMod.login(req.body.email,req.body.password,(newRes,message)=>{
-        res.send({
-            ok: newRes,
-            message: message
-        });})
-})
+    logMod.login(req.body.email,req.body.password,(isSuccess,message, userData )=>{
+        const responseObject = { ok: isSuccess,message: message, user: userData};
+        console.log("Server is sending:", responseObject);
+        res.json(responseObject);
+    });
+});
 
 app.listen(PORT,()=>{
     console.log("Listening on port "+ PORT)
-})
+});

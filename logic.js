@@ -8,25 +8,26 @@ export default class LogicService {
         this.dataMod.login(username,password,(res)=>{
             if(res.length==0)
                 callback(false,"Incorrect username or password")
-            else
-                callback(true,'')
-        })
+            else{
+                callback(true, '', res);
+            }
+        });
 
     }
     signup(info,callback){
         this.dataMod.checkUser(info.email,(res)=>{
             if(res.length==0){
-                if(info.role=='Client')
+                if(info.role==='client')
                     this.dataMod.signupClient(info,()=>{
                         callback(true)
                 })
-                else if (info.role=='Coach')
+                else if (info.role==='coach')
                     this.dataMod.signupCoach(info, ()=>{
                         callback(true)
                 })
             }
             else
                 callback(false)
-        })
+        });
     }
 }

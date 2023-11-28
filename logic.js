@@ -14,16 +14,20 @@ export default class LogicService {
 
     }
     signup(info, callback) {
-        this.dataMod.checkUser(info.email, (res) => {
-            if (res.length == 0) {
+        this.dataMod.checkUser(info.email, (err,res) => {
+            if(err){
+                console.log(err)
+                callback(false)
+            }
+            else if (res.length == 0) {
                 this.dataMod.signupUserAuth(info.email, info.password, (err, ress) => {
                     if (err) {
+                        console.log(err)
                         callback(false)
                     }
                     else {
-                        let userID = ress
-                        console.log("new ID:" + userID)
-                        this.dataMod.insertUser(info,userID, (err) => {
+                        let userID = ress[1][0].userID
+                        this.dataMod.signupUser(info,userID, (err) => {
                             if(err){
                                 console.log(err)
                                 this.dataMod.deleteUser(userID,()=>{
@@ -31,8 +35,8 @@ export default class LogicService {
                                 })
                             }
                             else{
-                            if (info.role == "Coach") {
-                                this.dataMod.insertCoach(info,(err)=>{
+                            if (info.role == "coach") {
+                                this.dataMod.signupCoach(info,userID,(err)=>{
                                     if(err){
                                         console.log(err)
                                         this.dataMod.deleteUser(userID,()=>{
@@ -47,7 +51,6 @@ export default class LogicService {
                             else{
                                 callback(true)
                             }
-
                         }
                         })
                     }

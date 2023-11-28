@@ -14,9 +14,9 @@ app.post('/signup',(req,res)=>{
     logMod.signup(req.body,(success)=>{
         res.send({ok: success})
     })
-    res.status(200).send({
-        ok: true
-     });
+    // res.status(200).send({
+    //     ok: true
+    //  });
 })
 app.post('/login',async (req,res)=>{
     logMod.login(req.body.email,req.body.password,(newRes,message)=>{

@@ -63,9 +63,9 @@ export default class DatabaseService {
     }
     
     insertCoachSurvey(surveyData, callback) {
-        const query = `INSERT INTO coach_survey (user_id, experience, city, state, cost) VALUES (?, ?, ?, ?, ?)`;//change to accept last param too
+        const query = `INSERT INTO coach_survey (user_id, experience, city, state, cost, goals) VALUES (?, ?, ?, ?, ?, ?)`;//change to accept last param too
         console.log("What will be inserted into coach_survey table ", surveyData);
-        const values = [surveyData.userID, surveyData.experience, surveyData.city, surveyData.state, surveyData.cost];
+        const values = [surveyData.userID, surveyData.experience, surveyData.city, surveyData.state, surveyData.cost, JSON.stringify(surveyData.goals)];
     
         this.connection.query(query, values, (err, results) => {
             if (err) {
@@ -83,7 +83,6 @@ export default class DatabaseService {
     
         this.connection.query(query, values, (err, results) => {
             if (err) {
-                console.log(err.message);
                 callback(false, err.message);
             } else {
                 // If the insert is successful, send back a success message.

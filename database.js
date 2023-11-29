@@ -56,7 +56,8 @@ export default class DatabaseService {
             if (err) {
                 callback(false, err.message);
             } else {
-                callback(true, 'Signup Client successful');
+                console.log("Results from database.js, ", results);
+                callback(true, 'Signup Client successful', results.insertId);
             }
         });
     }
@@ -68,6 +69,21 @@ export default class DatabaseService {
     
         this.connection.query(query, values, (err, results) => {
             if (err) {
+                callback(false, err.message);
+            } else {
+                // If the insert is successful, send back a success message.
+                callback(true, 'Survey data inserted successfully', surveyData);
+            }
+        });
+    }
+    insertClientSurvey(surveyData, callback) {
+        const query = `INSERT INTO survey (user_id, fitness_level, diet, weekly_exercise, goal_id) VALUES (?, ?, ?, ?, ?)`;//change to accept last param too
+        console.log("What will be inserted into survey table ", surveyData);
+        const values = [surveyData.userID, surveyData.currentFitnessLevel, surveyData.currentDiet, surveyData.currentExerciseSchedule, surveyData.fitnessGoal];
+    
+        this.connection.query(query, values, (err, results) => {
+            if (err) {
+                console.log(err.message);
                 callback(false, err.message);
             } else {
                 // If the insert is successful, send back a success message.

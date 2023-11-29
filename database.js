@@ -34,7 +34,7 @@ export default class DatabaseService {
         });
     }
     signupCoach(info, callback) {
-        console.log(info);
+        console.log("signupCoach() ",info);
         const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const values = [info.firstName, info.lastName, info.email, info.password, info.phoneNumber, info.streetAddress, info.city, info.state, info.zipCode, info.role];
 
@@ -42,13 +42,13 @@ export default class DatabaseService {
             if (err) {
                 callback(false, err.message, null);
             } else {
-                console.log(results.insertId);
+                console.log("Results from database.js, ", results);
                 callback(true, 'Signup Coach successful', results.insertId);
             }
         });
     }
     signupClient(info, callback) {
-        console.log(info);
+        console.log("signupClient()", info);
         const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
         const values = [info.firstName, info.lastName, info.email, info.password, info.phoneNumber, info.streetAddress, info.city, info.state, info.zipCode, info.role];
     
@@ -62,8 +62,8 @@ export default class DatabaseService {
     }
     
     insertCoachSurvey(surveyData, callback) {
-        const query = `INSERT INTO coach_survey (user_id, experience, city, state, cost) VALUES (?, ?, ?, ?, ?)`;
-        console.log("Query ", surveyData);
+        const query = `INSERT INTO coach_survey (user_id, experience, city, state, cost) VALUES (?, ?, ?, ?, ?)`;//change to accept last param too
+        console.log("What will be inserted into coach_survey table ", surveyData);
         const values = [surveyData.userID, surveyData.experience, surveyData.city, surveyData.state, surveyData.cost];
     
         this.connection.query(query, values, (err, results) => {

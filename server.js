@@ -2,9 +2,9 @@ import  express from 'express';
 import LogicService from './logic.js';
 import cors from 'cors'
 import DatabaseService from './database.js';
-const databaseService = new DatabaseService();
-let logMod=new LogicService()
 
+let logMod=new LogicService()
+let dataMod = new DatabaseService()
 const app = express();
 const PORT = process.env.PORT || 3001;
 //TODO: Make cors only apply to routes that need it
@@ -31,7 +31,7 @@ app.post('/login',async (req,res)=>{
 app.post('/coach-survey', async (req, res) => {
     const surveyData = req.body;
     console.log('Client Survey Data:', surveyData);
-    databaseService.insertCoachSurvey(surveyData, (success, message) => {
+    dataMod.insertCoachSurvey(surveyData, (success, message) => {
         if (success) {
             res.status(201).json({ ok: true, message });
         } else {

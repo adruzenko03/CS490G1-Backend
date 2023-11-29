@@ -15,7 +15,7 @@ export default class LogicService {
 
     }
     signup(info,callback){
-        console.log("info , " , info);
+        console.log("info from logic.js " , info);
         this.dataMod.checkUser(info.email,(res)=>{
             if(res.length==0){
                 if(info.role==='client'){

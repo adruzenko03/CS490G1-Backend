@@ -62,4 +62,10 @@ export default class LogicService {
                 callback(false)
         })
     }
+
+    getGoals(callback){
+        this.dataMod.getGoals((res)=>{
+            callback(res)
+        })
+    }
 }

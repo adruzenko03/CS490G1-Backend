@@ -18,7 +18,7 @@ app.post('/signup',(req,res)=>{
     //     ok: true
     //  });
 })
-app.post('/login',async (req,res)=>{
+app.post('/login',(req,res)=>{
     logMod.login(req.body.email,req.body.password,(status,resp)=>{
         if(status){
             res.status(200).send(resp);
@@ -26,6 +26,12 @@ app.post('/login',async (req,res)=>{
         else{
             res.status(404).send(resp);
         }
+    })
+})
+
+app.get('/goals',(req,res)=>{
+    logMod.getGoals((resp)=>{
+        res.status(200).send(resp)
     })
 })
 

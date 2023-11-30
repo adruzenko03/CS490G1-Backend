@@ -62,4 +62,10 @@ export default class DatabaseService {
             callback(err)
         })
     }
+
+    getGoals(callback){
+        this.connection.query(`SELECT * FROM goals`, (err,res)=>{
+            callback(res)
+        })
+    }
 }

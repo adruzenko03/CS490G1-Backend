@@ -19,11 +19,14 @@ app.post('/signup',(req,res)=>{
     //  });
 })
 app.post('/login',async (req,res)=>{
-    logMod.login(req.body.email,req.body.password,(newRes,message)=>{
-        res.send({
-            ok: newRes,
-            message: message
-        });})
+    logMod.login(req.body.email,req.body.password,(status,resp)=>{
+        if(status){
+            res.status(200).send(resp);
+        }
+        else{
+            res.status(404).send(resp);
+        }
+    })
 })
 
 app.listen(PORT,()=>{

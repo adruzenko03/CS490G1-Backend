@@ -4,12 +4,14 @@ export default class LogicService {
     constructor() {
         this.dataMod = new DatabaseService()
     }
+
     login(username, password, callback) {
         this.dataMod.login(username, password, (res) => {
+            console.log(res)
             if (res.length == 0)
-                callback(false, "Incorrect username or password")
+                callback(false, {message: "Incorrect username or password"})
             else
-                callback(true, '')
+                callback(true, {user:res})
         })
 
     }

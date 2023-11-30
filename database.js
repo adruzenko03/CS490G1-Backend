@@ -15,7 +15,7 @@ export default class DatabaseService {
         })
     }
     login(username, password, callback) {
-        this.connection.query(`SELECT * FROM users WHERE email='${username}' and password='${password}'`, (err, res) => {
+        this.connection.query(`SELECT * FROM user_auth WHERE email='${username}' and password='${password}'`, (err, res) => {
             callback(res);
         })
     }

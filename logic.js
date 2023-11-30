@@ -7,7 +7,6 @@ export default class LogicService {
 
     login(username, password, callback) {
         this.dataMod.login(username, password, (res) => {
-            console.log(res)
             if (res.length == 0)
                 callback(false, {message: "Incorrect username or password"})
             else
@@ -46,12 +45,12 @@ export default class LogicService {
                                         })
                                     }
                                     else{
-                                        callback(true)
+                                        callback(true, {userID: userID, role:info.role})
                                     }
                                 })
                             }
                             else{
-                                callback(true)
+                                callback(true, {userID: userID, role:info.role})
                             }
                         }
                         })

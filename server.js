@@ -11,8 +11,13 @@ app.use(cors());
 app.use(express.json())
 
 app.post('/signup',(req,res)=>{
-    logMod.signup(req.body,(success)=>{
-        res.send({ok: success})
+    logMod.signup(req.body,(status,resp)=>{
+        if(status){
+            res.status(201).send(resp);
+        }
+        else{
+            res.status(406).send();
+        }
     })
     // res.status(200).send({
     //     ok: true

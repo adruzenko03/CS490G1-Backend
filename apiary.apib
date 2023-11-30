@@ -1,0 +1,90 @@
+FORMAT: 1A
+HOST: temp/
+
+# Tru-Fit Backend
+
+All of the Documentation for the backend for Tru-Fit. If any functionality isn't present, contact a corresponding backend developer to have that functionality created or added to the API
+
+## Questions Collection [/login]
+
+### Register User [POST]
+Registers a new user, takes in a JSON with all available information and puts them into the database
+
++ Request (application/json)
+
+        {
+            "firstName":"test",
+            "lastName":"ing",
+            "password":"abc123",
+            "email":"testcoach@a.com",
+            "phoneNumber":"123456789",
+            "streetAddress":"123 Elmo Street",
+            "city":"Newark",
+            "state":"NJ",
+            "zip":"11223",
+            "role":"coach",
+            "currentFitnessLevel":"beginner",
+            "currentDiet":1,
+            "currentExerciseSchedule":"0-2",
+            "fitnessGoal":"gain muscle",
+            //Below are optional for coaches
+            "cost":123,
+            "experience":1
+        }
+        
++ Response 201 (application/json)
+
+        {
+           "user": {
+                        "userID": 123,
+                        "role":"coach"
+                    }
+        }
+        
++ Response 406 (application/json)
+
+        {
+           "user": {
+                        "userID": 123,
+                        "role":"coach"
+                    }
+        }
+
+### Login [GET]
+
+Login a user using this action. It takes in the user's email and password in the form of a JSON and returns the user's data
+
++ Request (application/json)
+
+        {
+            "email": "email",
+            "password": "Password1"
+        }
+
++ Response 200 (application/json)
+
+            {
+                "user": {
+                    "userID": 123,
+                    "role":"coach"
+                }
+            }
+            
++ Response 404 (application/json)
+
+        {
+            "message": "No such user found"
+        }
+
+## Goals [/goals]
+
+### Retrieve Goals [GET]
+
+Returns a list containing all the goals and their IDs
+
++ Response 200 (application/json)
+
+        {
+            "goalID":1,
+            "goal": "Flexibility"
+        }

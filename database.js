@@ -90,4 +90,18 @@ export default class DatabaseService {
             }
         });
     }
+
+    getSurveyData(userId, callback){
+    const query = 'SELECT * FROM survey WHERE user_id = ?';
+    this.connection.query(query, [userId], (err, results) => {
+        if (err) {
+            // If there's a database error, pass it back to the callback
+            callback(err);
+        } else {
+            // If the query is successful, pass the results back to the callback
+            console.log(results);
+            callback(null, results);
+        }
+    });
+    }
 }

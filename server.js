@@ -52,6 +52,18 @@ app.post('/client-survey', async (req, res) => {
     });
 });
 
+app.get('/surveyfetch/:userId', async (req, res) => {
+    const {userId} = req.params;
+    console.log("Made to Server.js", userId);
+    dataMod.getSurveyData(userId, (err, surveyData) => {
+        if(err){
+            res.status(500).json({ok:false, error: err.message});
+        } else {
+            res.status(200).json({ok:true, surveyData});
+        }
+    });
+});
+
 app.listen(PORT,()=>{
     console.log("Listening on port "+ PORT)
 });

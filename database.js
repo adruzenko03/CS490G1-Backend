@@ -5,7 +5,7 @@ export default class DatabaseService {
         this.connection=mysql.createConnection({
             host     : 'localhost',
             user     : 'root',
-            password : 'Nike2001.',
+            password : 'password',
             database : 'fitness'
         });
         this.connection.connect(err => {
@@ -17,11 +17,7 @@ export default class DatabaseService {
         });
     }
     login(username, password, callback) {
-<<<<<<< HEAD
-        this.connection.query(`SELECT * FROM users WHERE email='${username}' and password='${password}'`, (err, res) => {
-=======
         this.connection.query(`SELECT * FROM user_auth WHERE email='${username}' and password='${password}'`, (err, res) => {
->>>>>>> 84cecb879cbffef4204e5ada4c74ee2c98d9479e
             if (err) {
                 console.error("Database error:", err);
                 callback([]); 
@@ -36,79 +32,6 @@ export default class DatabaseService {
         this.connection.query(`SELECT * FROM users WHERE email='${email}'`,(err,res)=>{
             callback(res)
         });
-<<<<<<< HEAD
-    }
-    signupCoach(info, callback) {
-        console.log("signupCoach() ",info);
-        const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const values = [info.firstName, info.lastName, info.email, info.password, info.phoneNumber, info.streetAddress, info.city, info.state, info.zipCode, info.role];
-
-        this.connection.query(query, values, (err, results) => {
-            if (err) {
-                callback(false, err.message, null);
-            } else {
-                console.log("Results from database.js, ", results);
-                callback(true, 'Signup Coach successful', results.insertId);
-            }
-        });
-    }
-    signupClient(info, callback) {
-        console.log("signupClient()", info);
-        const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const values = [info.firstName, info.lastName, info.email, info.password, info.phoneNumber, info.streetAddress, info.city, info.state, info.zipCode, info.role];
-    
-        this.connection.query(query, values, (err, results) => {
-            if (err) {
-                callback(false, err.message);
-            } else {
-                console.log("Results from database.js, ", results);
-                callback(true, 'Signup Client successful', results.insertId);
-            }
-        });
-    }
-    
-    insertCoachSurvey(surveyData, callback) {
-        const query = `INSERT INTO coach_survey (user_id, experience, city, state, cost, goals) VALUES (?, ?, ?, ?, ?, ?)`;//change to accept last param too
-        console.log("What will be inserted into coach_survey table ", surveyData);
-        const values = [surveyData.userID, surveyData.experience, surveyData.city, surveyData.state, surveyData.cost, JSON.stringify(surveyData.goals)];
-    
-        this.connection.query(query, values, (err, results) => {
-            if (err) {
-                callback(false, err.message);
-            } else {
-                // If the insert is successful, send back a success message.
-                callback(true, 'Survey data inserted successfully', surveyData);
-            }
-        });
-    }
-    insertClientSurvey(surveyData, callback) {
-        const query = `INSERT INTO survey (user_id, fitness_level, diet, weekly_exercise, goal_id) VALUES (?, ?, ?, ?, ?)`;//change to accept last param too
-        console.log("What will be inserted into survey table ", surveyData);
-        const values = [surveyData.userID, surveyData.currentFitnessLevel, surveyData.currentDiet, surveyData.currentExerciseSchedule, surveyData.fitnessGoal];
-    
-        this.connection.query(query, values, (err, results) => {
-            if (err) {
-                callback(false, err.message);
-            } else {
-                // If the insert is successful, send back a success message.
-                callback(true, 'Survey data inserted successfully', surveyData);
-            }
-        });
-    }
-
-    getSurveyData(userId, callback){
-    const query = 'SELECT * FROM survey WHERE user_id = ?';
-    this.connection.query(query, [userId], (err, results) => {
-        if (err) {
-            // If there's a database error, pass it back to the callback
-            callback(err);
-        } else {
-            // If the query is successful, pass the results back to the callback
-            console.log(results);
-            callback(null, results);
-        }
-    });
-=======
     }
     signupCoach(info, callback) {
         console.log("signupCoach() ",info);
@@ -227,9 +150,7 @@ export default class DatabaseService {
                 callback(null, results)
             }
         })
->>>>>>> 84cecb879cbffef4204e5ada4c74ee2c98d9479e
     }
-
     getExperienceList(callback){
         const query = `SELECT DISTINCT experience FROM coach_survey;`
         this.connection.query(query, (err,results)=>{

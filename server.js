@@ -63,12 +63,6 @@ app.get('/surveyfetch/:userId', async (req, res) => {
         }
     });
 });
-<<<<<<< HEAD
-
-app.listen(PORT,()=>{
-    console.log("Listening on port "+ PORT)
-});
-=======
 
 app.get('/clientRequestsFetch/:coachId', async(req, res)=>{
     const {coachId} = req.params;
@@ -148,4 +142,3 @@ app.get('/coachList', async(req, res)=>{
 app.listen(PORT,()=>{
     console.log("Listening on port "+ PORT)
 });
->>>>>>> 84cecb879cbffef4204e5ada4c74ee2c98d9479e

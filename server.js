@@ -63,7 +63,89 @@ app.get('/surveyfetch/:userId', async (req, res) => {
         }
     });
 });
+<<<<<<< HEAD
 
 app.listen(PORT,()=>{
     console.log("Listening on port "+ PORT)
 });
+=======
+
+app.get('/clientRequestsFetch/:coachId', async(req, res)=>{
+    const {coachId} = req.params;
+    console.log("Made to Server.js", coachId);
+    dataMod.getPendingClientRequests(coachId, (err, surveyData)=>{
+        if(err){
+            res.status(500).json({ok:false, error:err.message});
+        }else{
+            res.status(200).json({ok:true, surveyData});
+        }
+    })
+})
+
+app.get('/acceptedClients/:coachId', async(req, res)=>{
+    const {coachId} = req.params;
+    console.log("Made to Server.js", coachId);
+    dataMod.getAcceptedClients(coachId, (err, surveyData)=>{
+        if(err){
+            res.status(500).json({ok:false, error:err.message});
+        }else{
+            res.status(200).json({ok:true, surveyData});
+        }
+    })
+})
+
+app.get('/goalsList', async(req, res)=>{
+    console.log("Made to Server.js");
+    dataMod.getGoalsList((err, surveyData)=>{
+        if(err){
+            res.status(500).json({ok:false, error:err.message});
+        }else{
+            res.status(200).json({ok:true, surveyData});
+        }
+    })
+})
+app.get('/experienceList', async(req, res)=>{
+    console.log("Made to Server.js");
+    dataMod.getExperienceList((err, surveyData)=>{
+        if(err){
+            res.status(500).json({ok:false, error:err.message});
+        }else{
+            res.status(200).json({ok:true, surveyData});
+        }
+    })
+})
+app.get('/locationList', async(req, res)=>{
+    console.log("Made to Server.js");
+    dataMod.getLocationList((err, surveyData)=>{
+        if(err){
+            res.status(500).json({ok:false, error:err.message});
+        }else{
+            res.status(200).json({ok:true, surveyData});
+        }
+    })
+})
+app.get('/costList', async(req, res)=>{
+    console.log("Made to Server.js");
+    dataMod.getPriceList((err, surveyData)=>{
+        if(err){
+            res.status(500).json({ok:false, error:err.message});
+        }else{
+            res.status(200).json({ok:true, surveyData});
+        }
+    })
+})
+app.get('/coachList', async(req, res)=>{
+    console.log("Made to Server.js");
+    dataMod.getCoachList((err, surveyData)=>{
+        if(err){
+            res.status(500).json({ok:false, error:err.message});
+        }else{
+            res.status(200).json({ok:true, surveyData});
+        }
+    })
+})
+
+app.listen(PORT,()=>{
+    console.log("Listening on port "+ PORT)
+});
+>>>>>>> 84cecb879cbffef4204e5ada4c74ee2c98d9479e

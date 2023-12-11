@@ -1,16 +1,14 @@
 import  express from 'express';
 import LogicService from './logic.js';
 import cors from 'cors'
-import DatabaseService from './database.js';
-
 let logMod=new LogicService()
-let dataMod = new DatabaseService()
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 //TODO: Make cors only apply to routes that need it
+
 app.use(cors()); 
 app.use(express.json())
-
 app.post('/signup',async (req, res) => {
     logMod.signup(req.body, (success, message, userId) => {
         if (success) {

@@ -16,6 +16,7 @@ export default class DatabaseService {
             console.log('Database connection established');
         });
     }
+    
     login(username, password, callback) {
         this.connection.query(`SELECT * FROM user_auth WHERE email='${username}' and password='${password}'`, (err, res) => {
             if (err) {

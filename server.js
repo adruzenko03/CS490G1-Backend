@@ -1,5 +1,6 @@
 import  express from 'express';
 import LogicService from './logic.js';
+import DatabaseService from './database.js';
 import cors from 'cors'
 
 let logMod=new LogicService()
@@ -39,6 +40,66 @@ app.get('/goals',(req,res)=>{
         res.status(200).send(resp)
     })
 })
+
+app.post('/coach-survey', async (req, res) => {
+    const surveyData = req.body;
+    console.log('Coach Survey Data:', surveyData);
+    dataMod.insertCoachSurvey(surveyData, (success, message) => {
+        if (success) {
+            res.status(201).json({ ok: true, message });
+        } else {
+            res.status(500).json({ ok: false, message });
+        }
+    });
+});
+
+app.post('/client-survey', async (req, res) => {
+    const surveyData = req.body;
+    console.log('Client Survey Data:', surveyData);
+    dataMod.insertClientSurvey(surveyData, (success, message) => {
+        if (success) {
+            res.status(201).json({ ok: true, message });
+        } else {
+            res.status(500).json({ ok: false, message });
+        }
+    });
+});
+
+app.get('/surveyfetch/:userId', async (req, res) => {
+    const {userId} = req.params;
+    console.log("Made to Server.js", userId);
+    dataMod.getSurveyData(userId, (err, surveyData) => {
+        if(err){
+            res.status(500).json({ok:false, error: err.message});
+        } else {
+            res.status(200).json({ok:true, surveyData});
+        }
+    });
+});
+
+app.get('/acceptedClients/:userId', async (req, res) => {
+    const {userId} = req.params;
+    console.log("Made to Server.js via acceptedClients", userId);
+    dataMod.getAcceptedClients(userId, (err, acceptedClients) => {
+        if(err){
+            res.status(500).json({ok:false, error: err.message});
+        } else {
+            res.status(200).json({ok:true, acceptedClients});
+        }
+    });
+});
+
+app.get('/clientRequestsFetch/:userId', async (req, res) => {
+    const {userId} = req.params;
+    console.log("Made to Server.js via clientRequestsFetch", userId);
+    dataMod.getSurveyData(userId, (err, surveyData) => {
+        if(err){
+            res.status(500).json({ok:false, error: err.message});
+        } else {
+            res.status(200).json({ok:true, surveyData});
+        }
+    });
+});
 
 app.listen(PORT,()=>{
     console.log("Listening on port "+ PORT)

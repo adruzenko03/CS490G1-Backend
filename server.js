@@ -3,7 +3,7 @@ import LogicService from './logic.js';
 import cors from 'cors'
 
 let logMod=new LogicService()
-
+let dataMod = new DatabaseService()
 const app = express();
 const PORT = process.env.PORT || 3001;
 //TODO: Make cors only apply to routes that need it
@@ -42,4 +42,4 @@ app.get('/goals',(req,res)=>{
 
 app.listen(PORT,()=>{
     console.log("Listening on port "+ PORT)
-})
+});

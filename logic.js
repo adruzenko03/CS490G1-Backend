@@ -59,7 +59,7 @@ export default class LogicService {
             }
             else
                 callback(false)
-        })
+        });
     }
 
     getGoals(callback){

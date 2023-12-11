@@ -31,7 +31,7 @@ app.post('/login',async (req,res)=>{
 app.post('/coach-survey', async (req, res) => {
     const surveyData = req.body;
     console.log('Coach Survey Data:', surveyData);
-    dataMod.insertCoachSurvey(surveyData, (success, message) => {
+    DatabaseService.insertCoachSurvey(surveyData, (success, message) => {
         if (success) {
             res.status(201).json({ ok: true, message });
         } else {

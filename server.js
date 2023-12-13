@@ -107,6 +107,19 @@ app.get("/exercises", (req, res) => {
         .json({ ok: false, message: "Error retrieving exercises" });
     }
   });
+
+});
+
+app.get("/workouts", (req, res) => {
+  logMod.getWorkouts((success, result) => {
+    if (success) {
+      res.status(200).json({ ok: true, exercises: result });
+    } else {
+      res
+        .status(500)
+        .json({ ok: false, message: "Error retrieving workouts" });
+    }
+  });
 });
 
 app.listen(PORT, () => {

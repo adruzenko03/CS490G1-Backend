@@ -67,7 +67,6 @@ export default class LogicService {
     });
   }
 
-
   getExercises(callback) {
     this.dataMod.getExercises((error, exercises) => {
       if (error) {
@@ -78,5 +77,15 @@ export default class LogicService {
       }
     });
   }
-  
+
+  getWorkouts(callback) {
+    this.dataMod.getWorkouts((error, exercises) => {
+      if (error) {
+        console.error("Error retrieving Workouts", error);
+        callback(false, { message: "Error retrieving Workouts" });
+      } else {
+        callback(true, exercises);
+      }
+    });
+  }
 }

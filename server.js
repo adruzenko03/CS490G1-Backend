@@ -155,6 +155,7 @@ app.post('/declineClient/:userId', (req, res) => {
             res.status(200).send('Client declined successfully');
         }
     });
+});
 app.get("/workouts", (req, res) => {
   logMod.getWorkouts((success, result) => {
     if (success) {
@@ -232,5 +233,5 @@ app.post("/activitySurvey", (req, res) => {
 
 
 app.listen(PORT, () => {
-  console.log("Listening on port " + PORT);
-});
+    console.log("Listening on port " + PORT);
+})

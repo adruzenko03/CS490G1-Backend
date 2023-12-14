@@ -101,9 +101,10 @@ app.get('/clientRequestsFetch/:userId', async (req, res) => {
     });
 });
 
-app.delete('/removeClient/:userId', (req, res) => {
-    const { userId } = req.params;
-    logMod.removeClient(userId, (err, result) => {
+app.delete('/removeClient/:clientId/:coachId', (req, res) => {
+    const {clientId, coachId} = req.params;
+    console.log("from remove client",clientId, coachId);
+    logMod.removeClient(clientId, coachId, (err, result) => {
         if (err) {
             res.status(500).send('Error removing client');
         } else {
@@ -112,10 +113,10 @@ app.delete('/removeClient/:userId', (req, res) => {
     });
 });
 
-app.post('/acceptClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.acceptClient(userId, (err, result) => {
+app.post('/acceptClient', (req, res) => {
+    const {clientId, coachId} = req.body;
+    console.log("Client id", clientId);
+    logMod.acceptClient(clientId, coachId, (err, result) => {
         if (err) {
             res.status(500).send('Error accepting client');
         } else {
@@ -124,10 +125,10 @@ app.post('/acceptClient/:userId', (req, res) => {
     });
 });
 
-app.post('/declineClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.declineClient(userId, (err, result) => {
+app.post('/declineClient', (req, res) => {
+    const {clientId, coachId} = req.body;
+    console.log("Client id", clientId);
+    logMod.declineClient(clientId, coachId, (err, result) => {
         if (err) {
             res.status(500).send('Error declining client');
         } else {

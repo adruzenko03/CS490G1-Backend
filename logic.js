@@ -74,8 +74,8 @@ export default class LogicService {
             callback(res)
         })
     }
-    removeClient(userId, callback) {
-        this.dataMod.removeClient(userId, (err, result) => {
+    removeClient(clientId, coachId,callback) {
+        this.dataMod.removeClient(clientId, coachId,(err, result) => {
             if (err) {
                 callback(err, null);
             } else {
@@ -84,8 +84,8 @@ export default class LogicService {
         });
     }
 
-    acceptClient(userId, callback) {
-        this.dataMod.acceptClient(userId, (err, result) => {
+    acceptClient(clientId, coachId, callback) {
+        this.dataMod.acceptClient(clientId, coachId,(err, result) => {
             if (err) {
                 callback(err, null);
             } else {
@@ -94,8 +94,8 @@ export default class LogicService {
         });
     }
 
-    declineClient(userId, callback) {
-        this.dataMod.declineClient(userId, (err, result) => {
+    declineClient(clientId, coachId, callback) {
+        this.dataMod.declineClient(clientId, coachId,(err, result) => {
             if (err) {
                 callback(err, null);
             } else {

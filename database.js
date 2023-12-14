@@ -136,9 +136,9 @@ export default class DatabaseService {
             }
         });
     }
-    removeClient(userId, callback) {
-        const query = 'DELETE FROM coach_client_connections WHERE client_id = ?';
-        this.connection.query(query, [userId], (err, result) => {
+    removeClient(clientId, coachId, callback) {
+        const query = 'DELETE FROM coach_client_connections WHERE client_id = ? AND coach_id = ?';
+        this.connection.query(query, [clientId, coachId], (err, result) => {
             if (err) {
                 callback(err, null);
             } else {
@@ -157,20 +157,46 @@ export default class DatabaseService {
         });
     }
 
-    acceptClient(userId, callback) {
-        const query = 'UPDATE coach_client_connections SET status = "accepted" WHERE client_id = ?';
-        this.connection.query(query, [userId], (err, result) => {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, result);
+    acceptClient(clientId, coachId, callback) {
+        const query = 'UPDATE coach_client_connections SET status = "accepted" WHERE client_id = ? AND coach_id = ?';
+        const declineothers = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ? AND coach_id != ?';
+        
+        this.connection.beginTransaction(err => {
+            if (err) { 
+                callback(err); 
+                return; 
             }
+    
+            this.connection.query(query, [clientId, coachId], (err, acceptresult) => {
+                if (err) {
+                    return this.connection.rollback(() => {
+                        callback(err);
+                    });
+                }
+    
+                this.connection.query(declineothers, [clientId, coachId], (err, declineresult) => {
+                    if (err) {
+                        return this.connection.rollback(() => {
+                            callback(err);
+                        });
+                    }
+    
+                    this.connection.commit(err => {
+                        if (err) {
+                            return this.connection.rollback(() => {
+                                callback(err);
+                            });
+                        }
+                        callback(null, { acceptresult, declineresult });
+                    });
+                });
+            });
         });
     }
     
-    declineClient(userId, callback) {
-        const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ?';
-        this.connection.query(query, [userId], (err, result) => {
+    declineClient(clientId, coachId, callback) {
+        const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ? AND coach_id = ?';
+        this.connection.query(query, [clientId, coachId], (err, result) => {
             if (err) {
                 callback(err, null);
             } else {

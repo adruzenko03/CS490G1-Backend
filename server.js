@@ -156,6 +156,7 @@ app.post('/declineClient', (req, res) => {
             res.status(200).send('Client declined successfully');
         }
     });
+});
 app.get("/workouts", (req, res) => {
   logMod.getWorkouts((success, result) => {
     if (success) {

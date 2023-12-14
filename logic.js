@@ -99,4 +99,28 @@ export default class LogicService {
       }
     });
   }
+
+  updateCoachStatus(coach_id, actionType, callback) {
+    if (actionType === 'accept') {
+      this.dataMod.acceptCoach(coach_id, (error, result) => {
+        if (error) {
+          console.error('Error accepting coach:', error);
+          callback(error, null);
+        } else {
+          callback(null, result);
+        }
+      });
+    } else if (actionType === 'decline') {
+      this.dataMod.declineCoach(coach_id, (error, result) => {
+        if (error) {
+          console.error('Error declining coach:', error);
+          callback(error, null);
+        } else {
+          callback(null, result);
+        }
+      });
+    } else {
+      callback('Invalid  action', null);
+    }
+  }
 }

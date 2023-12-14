@@ -132,6 +132,20 @@ app.get('/pendingCoaches', (req, res) => {
   });
 });
 
+app.post('/updateCoachStatus/:coach_id/:actionType', (req, res) => {
+  const coach_id = req.params.coach_id;
+  const actionType = req.params.actionType;
+
+  logMod.updateCoachStatus(coach_id, actionType, (err, result) => {
+    if (err) {
+      console.error('Error updating coach status:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      res.json(result);
+    }
+  });
+});
+
 app.listen(PORT, () => {
   console.log("Listening on port " + PORT);
 });

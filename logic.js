@@ -127,4 +127,15 @@ export default class LogicService {
       }
     );
   }
+
+  getActivity(callback) {
+    this.dataMod.getActivity((error, Activities) => {
+      if (error) {
+        console.error("Error retrieving Activities", error);
+        callback(false, { message: "Error retrieving Activities" });
+      } else {
+        callback(true, Activities);
+      }
+    });
+  }
 }

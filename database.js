@@ -242,4 +242,14 @@ export default class DatabaseService {
       }
     });
   }
+
+  getActivity(callback) {
+    const query = "SELECT * FROM daily_activity";
+    this.connection.query(query, (error, results) => {
+      if (error) {
+        return callback(error);
+      }
+      callback(null, results);
+    });
+  }
 }

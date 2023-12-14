@@ -155,6 +155,17 @@ app.post("/workoutsadded", (req, res) => {
   });
 });
 
+app.get("/activities", (req, res) => {
+  logMod.getActivity((status, activities) => {
+    if (status) {
+      res.status(200).json({ ok: true, activities });
+    } else {
+      res
+        .status(500)
+        .json({ ok: false, message: "Error retrieving activities" });
+    }
+  });
+});
 
 
 app.listen(PORT, () => {

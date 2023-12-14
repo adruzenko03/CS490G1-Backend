@@ -1,4 +1,4 @@
-import mysql from "mysql2";
+import mysql from 'mysql2';
 import "dotenv/config.js";
 
 export default class DatabaseService {
@@ -193,7 +193,8 @@ export default class DatabaseService {
   }
   getWorkouts(callback) {
     const query =
-      "SELECT workouts.workout_id, workouts.workout_name, goals.goal, GROUP_CONCAT(DISTINCT exercises.exercise_name SEPARATOR ', ') AS exercises, workouts.difficulty, GROUP_CONCAT(DISTINCT CONCAT(UCASE(LEFT(muscle_groups.muscle, 1)), SUBSTRING(muscle_groups.muscle, 2)) SEPARATOR ', ') AS muscle_groups, GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_list FROM workouts JOIN goals ON workouts.goal_id = goals.goal_id JOIN workout_exercises ON workouts.workout_id = workout_exercises.workout_id JOIN exercises ON workout_exercises.exercise_id = exercises.exercise_id JOIN workout_muscle_groups ON workouts.workout_id = workout_muscle_groups.workout_id JOIN muscle_groups ON workout_muscle_groups.muscle_id = muscle_groups.muscle_id JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY workouts.workout_id, workouts.workout_name, goals.goal, workouts.difficulty;";
+      "SELECT workouts.workout_name, goals.goal, GROUP_CONCAT(DISTINCT exercises.exercise_name SEPARATOR ', ') AS exercises, workouts.difficulty, muscle_groups.muscle, GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_list FROM workouts JOIN goals ON workouts.goal_id = goals.goal_id JOIN workout_exercises ON workouts.workout_id = workout_exercises.workout_id JOIN exercises ON workout_exercises.exercise_id = exercises.exercise_id JOIN workout_muscle_groups ON workouts.workout_id = workout_muscle_groups.workout_id JOIN muscle_groups ON workout_muscle_groups.muscle_id = muscle_groups.muscle_id JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY workouts.workout_name, goals.goal, workouts.difficulty, muscle_groups.muscle;";
+
     this.connection.query(query, (error, results, fields) => {
       if (error) {
         return callback(error);
@@ -201,10 +202,10 @@ export default class DatabaseService {
       callback(null, results);
     });
   }
-  
-  getUserWorkouts(callback) {
+  getPendingCoaches(callback) {
     const query =
-      "SELECT workouts.workout_id, workouts.workout_name, goals.goal, GROUP_CONCAT(DISTINCT exercises.exercise_name SEPARATOR ', ') AS exercises, workouts.difficulty, GROUP_CONCAT(DISTINCT CONCAT(UCASE(LEFT(muscle_groups.muscle, 1)), SUBSTRING(muscle_groups.muscle, 2)) SEPARATOR ', ') AS muscle_groups, GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_list, user_workouts.user_id FROM workouts JOIN goals ON workouts.goal_id = goals.goal_id JOIN workout_exercises ON workouts.workout_id = workout_exercises.workout_id JOIN exercises ON workout_exercises.exercise_id = exercises.exercise_id JOIN workout_muscle_groups ON workouts.workout_id = workout_muscle_groups.workout_id JOIN muscle_groups ON workout_muscle_groups.muscle_id = muscle_groups.muscle_id JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id JOIN user_workouts ON workouts.workout_id = user_workouts.workout_id GROUP BY workouts.workout_id, workouts.workout_name, goals.goal, workouts.difficulty, user_workouts.user_id;";
+      "SELECT users.first_name, users.last_name, coach_survey.experience, coach_survey.goal, coach_survey.cost FROM users JOIN coach_survey ON users.user_id = coach_survey.user_id JOIN coach_status ON coach_status.coach_id = users.user_id WHERE coach_status.status='pending'";
+  
     this.connection.query(query, (error, results, fields) => {
       if (error) {
         return callback(error);
@@ -212,131 +213,4 @@ export default class DatabaseService {
       callback(null, results);
     });
   }
-
-  deleteUserWorkout(userId, workoutId, callback) {
-    const deleteQuery =
-      "DELETE FROM user_workouts WHERE user_id = ? AND workout_id = ?";
-
-    this.connection.query(deleteQuery, [userId, workoutId], (err, results) => {
-      if (err) {
-        console.error("Error deleting user workout:", err);
-        callback(false, err.message);
-      } else {
-        console.log("User workout deleted successfully");
-        callback(true, "User workout deleted successfully");
-      }
-    });
-  }
-
-  insertUserWorkout(userId, workoutId, callback) {
-    const insertQuery =
-      "INSERT INTO user_workouts (user_id, workout_id) VALUES (?, ?)";
-
-    this.connection.query(insertQuery, [userId, workoutId], (err, results) => {
-      if (err) {
-        console.error("Error inserting user workout:", err);
-        callback(false, err.message);
-      } else {
-        console.log("User workout inserted successfully");
-        callback(true, "User workout inserted successfully", results.insertId);
-      }
-    });
-  }
-
-  getActivity(callback) {
-    const query = "SELECT * FROM daily_activity";
-    this.connection.query(query, (error, results) => {
-      if (error) {
-        return callback(error);
-      }
-      callback(null, results);
-    });
-  }
-
-  insertUserDailyActivity(
-    userId,
-    entryDate,
-    calorieIntake,
-    bodyWeight,
-    callback
-  ) {
-    const insertQuery =
-      "INSERT INTO daily_activity (user_id, entry_date, calorie_intake, body_weight) VALUES (?, ?, ?, ?)";
-    this.connection.query(
-      insertQuery,
-      [userId, entryDate, calorieIntake, bodyWeight],
-      (err, results) => {
-        if (err) {
-          console.error("Error inserting daily activity:", err);
-          callback(false, err.message);
-        } else {
-          console.log("Daily activity inserted successfully");
-          callback(
-            true,
-            "Daily activity inserted successfully",
-            results.insertId
-          );
-        }
-      }
-    );
-  }
-}
-getAcceptedClients(userId, callback){
-  const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'accepted'";
-  //'SELECT u.*, s.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"'; with goal_id(int)
-  //'SELECT u.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"';   without goal_id
-
-  this.connection.query(query, [userId], (err, results) => {
-      if (err) {
-          // If there's a database error, pass it back to the callback
-          callback(err);
-      } else {
-          // If the query is successful, pass the results back to the callback
-          console.log(results);
-          callback(null, results);
-      }
-  });
-}
-removeClient(userId, callback) {
-  const query = 'DELETE FROM coach_client_connections WHERE client_id = ?';
-  this.connection.query(query, [userId], (err, result) => {
-      if (err) {
-          callback(err, null);
-      } else {
-          callback(null, result);
-      }
-  });
-}
-getRequestedClients(userId, callback){
-  const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'pending'";
-  this.connection.query(query, [userId], (err, result) =>{
-      if(err){
-          callback(err, null);
-      } else {
-          callback(null, result);
-      }
-  });
-}
-
-acceptClient(userId, callback) {
-  const query = 'UPDATE coach_client_connections SET status = "accepted" WHERE client_id = ?';
-  this.connection.query(query, [userId], (err, result) => {
-      if (err) {
-          callback(err, null);
-      } else {
-          callback(null, result);
-      }
-  });
-}
-
-declineClient(userId, callback) {
-  const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ?';
-  this.connection.query(query, [userId], (err, result) => {
-      if (err) {
-          callback(err, null);
-      } else {
-          callback(null, result);
-      }
-  });
-}
 }

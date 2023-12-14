@@ -36,7 +36,7 @@ app.get("/goals", (req, res) => {
     res.status(200).send(resp);
   });
 });
-
+/*
 app.post("/coach-survey", async (req, res) => {
   const surveyData = req.body;
   console.log("Coach Survey Data:", surveyData);
@@ -96,7 +96,7 @@ app.get("/clientRequestsFetch/:userId", async (req, res) => {
     }
   });
 });
-
+*/
 app.get("/exercises", (req, res) => {
   logMod.getExercises((success, result) => {
     if (success) {
@@ -110,51 +110,6 @@ app.get("/exercises", (req, res) => {
 
 });
 
-app.get('/clientRequestsFetch/:userId', async (req, res) => {
-    const {userId} = req.params;
-    console.log("Made to Server.js via clientRequestsFetch", userId);
-    logMod.getClientRequests(userId, (err, Data) => {
-        if(err){
-            res.status(500).json({ok:false, error: err.message});
-        } else {
-            res.status(200).json({ok:true, Data});
-        }
-    });
-});
-
-app.delete('/removeClient/:userId', (req, res) => {
-    const { userId } = req.params;
-    logMod.removeClient(userId, (err, result) => {
-        if (err) {
-            res.status(500).send('Error removing client');
-        } else {
-            res.status(200).send('Client removed successfully');
-        }
-    });
-});
-
-app.post('/acceptClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.acceptClient(userId, (err, result) => {
-        if (err) {
-            res.status(500).send('Error accepting client');
-        } else {
-            res.status(200).send('Client accepted successfully');
-        }
-    });
-});
-
-app.post('/declineClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.declineClient(userId, (err, result) => {
-        if (err) {
-            res.status(500).send('Error declining client');
-        } else {
-            res.status(200).send('Client declined successfully');
-        }
-    });
 app.get("/workouts", (req, res) => {
   logMod.getWorkouts((success, result) => {
     if (success) {
@@ -167,69 +122,15 @@ app.get("/workouts", (req, res) => {
   });
 });
 
-app.get("/myworkouts", (req, res) => {
-  logMod.getUserWorkouts((success, result) => {
+app.get('/pendingCoaches', (req, res) => {
+  logMod.getPendingCoaches((success, coaches) => {
     if (success) {
-      res.status(200).json({ ok: true, exercises: result });
+      res.json(coaches);
     } else {
-      res.status(500).json({ ok: false, message: "Error retrieving workouts" });
+      res.status(500).send('Internal Server Error');
     }
   });
 });
-
-app.delete("/workoutsremoved", (req, res) => {
-  const { userId, workoutId } = req.body;
-
-  logMod.deleteUserWorkout(userId, workoutId, (success, message, insertId) => {
-    if (success) {
-      res.status(200).json({ ok: true, message });
-    } else {
-      res.status(500).json({ ok: false, message });
-    }
-  });
-});
-
-app.post("/workoutsadded", (req, res) => {
-  const { userId, workoutId } = req.body;
-  logMod.insertUserWorkout(userId, workoutId, (success, message, insertId) => {
-    if (success) {
-      res.status(201).json({ ok: true, message, insertId });
-    } else {
-      res.status(500).json({ ok: false, message });
-    }
-  });
-});
-
-app.get("/activities", (req, res) => {
-  logMod.getActivity((status, activities) => {
-    if (status) {
-      res.status(200).json({ ok: true, activities });
-    } else {
-      res
-        .status(500)
-        .json({ ok: false, message: "Error retrieving activities" });
-    }
-  });
-});
-
-app.post("/activitySurvey", (req, res) => {
-  const { userId, entryDate, calorieIntake, bodyWeight } = req.body;
-
-  logMod.insertUserDailyActivity(
-    userId,
-    entryDate,
-    calorieIntake,
-    bodyWeight,
-    (success, message, insertId) => {
-      if (success) {
-        res.status(201).json({ ok: true, message, insertId });
-      } else {
-        res.status(500).json({ ok: false, message });
-      }
-    }
-  );
-});
-
 
 app.listen(PORT, () => {
   console.log("Listening on port " + PORT);

@@ -122,6 +122,41 @@ app.get("/workouts", (req, res) => {
   });
 });
 
+app.get("/myworkouts", (req, res) => {
+  logMod.getUserWorkouts((success, result) => {
+    if (success) {
+      res.status(200).json({ ok: true, exercises: result });
+    } else {
+      res.status(500).json({ ok: false, message: "Error retrieving workouts" });
+    }
+  });
+});
+
+app.delete("/workoutsremoved", (req, res) => {
+  const { userId, workoutId } = req.body;
+
+  logMod.deleteUserWorkout(userId, workoutId, (success, message, insertId) => {
+    if (success) {
+      res.status(200).json({ ok: true, message });
+    } else {
+      res.status(500).json({ ok: false, message });
+    }
+  });
+});
+
+app.post("/workoutsadded", (req, res) => {
+  const { userId, workoutId } = req.body;
+  logMod.insertUserWorkout(userId, workoutId, (success, message, insertId) => {
+    if (success) {
+      res.status(201).json({ ok: true, message, insertId });
+    } else {
+      res.status(500).json({ ok: false, message });
+    }
+  });
+});
+
+
+
 app.listen(PORT, () => {
   console.log("Listening on port " + PORT);
 });

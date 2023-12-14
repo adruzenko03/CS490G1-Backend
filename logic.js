@@ -88,4 +88,43 @@ export default class LogicService {
       }
     });
   }
+
+  getUserWorkouts(callback) {
+    this.dataMod.getUserWorkouts((error, exercises) => {
+      if (error) {
+        console.error("Error retrieving Workouts", error);
+        callback(false, { message: "Error retrieving Workouts" });
+      } else {
+        callback(true, exercises);
+      }
+    });
+  }
+
+  deleteUserWorkout(userId, workoutId, callback) {
+    this.dataMod.deleteUserWorkout(
+      userId,
+      workoutId,
+      (success, message, insertId) => {
+        if (success) {
+          callback(true, message, insertId);
+        } else {
+          callback(false, { message: "Error inserting user workout" });
+        }
+      }
+    );
+  }
+
+  insertUserWorkout(userId, workoutId, callback) {
+    this.dataMod.insertUserWorkout(
+      userId,
+      workoutId,
+      (success, message, insertId) => {
+        if (success) {
+          callback(true, message, insertId);
+        } else {
+          callback(false, { message: "Error inserting user workout" });
+        }
+      }
+    );
+  }
 }

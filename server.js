@@ -167,6 +167,24 @@ app.get("/activities", (req, res) => {
   });
 });
 
+app.post("/activitySurvey", (req, res) => {
+  const { userId, entryDate, calorieIntake, bodyWeight } = req.body;
+
+  logMod.insertUserDailyActivity(
+    userId,
+    entryDate,
+    calorieIntake,
+    bodyWeight,
+    (success, message, insertId) => {
+      if (success) {
+        res.status(201).json({ ok: true, message, insertId });
+      } else {
+        res.status(500).json({ ok: false, message });
+      }
+    }
+  );
+});
+
 
 app.listen(PORT, () => {
   console.log("Listening on port " + PORT);

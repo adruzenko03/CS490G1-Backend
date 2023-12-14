@@ -252,4 +252,32 @@ export default class DatabaseService {
       callback(null, results);
     });
   }
+
+  insertUserDailyActivity(
+    userId,
+    entryDate,
+    calorieIntake,
+    bodyWeight,
+    callback
+  ) {
+    const insertQuery =
+      "INSERT INTO daily_activity (user_id, entry_date, calorie_intake, body_weight) VALUES (?, ?, ?, ?)";
+    this.connection.query(
+      insertQuery,
+      [userId, entryDate, calorieIntake, bodyWeight],
+      (err, results) => {
+        if (err) {
+          console.error("Error inserting daily activity:", err);
+          callback(false, err.message);
+        } else {
+          console.log("Daily activity inserted successfully");
+          callback(
+            true,
+            "Daily activity inserted successfully",
+            results.insertId
+          );
+        }
+      }
+    );
+  }
 }

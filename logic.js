@@ -138,4 +138,26 @@ export default class LogicService {
       }
     });
   }
+
+  insertUserDailyActivity(
+    userId,
+    entryDate,
+    calorieIntake,
+    bodyWeight,
+    callback
+  ) {
+    this.dataMod.insertUserDailyActivity(
+      userId,
+      entryDate,
+      calorieIntake,
+      bodyWeight,
+      (success, message, insertId) => {
+        if (success) {
+          callback(true, message, insertId);
+        } else {
+          callback(false, { message: "Error inserting user daily activity" });
+        }
+      }
+    );
+  }
 }

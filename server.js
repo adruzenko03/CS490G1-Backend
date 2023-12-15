@@ -145,16 +145,18 @@ app.post('/acceptClient/:userId', (req, res) => {
     });
 });
 
-app.post('/declineClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.declineClient(userId, (err, result) => {
-        if (err) {
-            res.status(500).send('Error declining client');
-        } else {
-            res.status(200).send('Client declined successfully');
-        }
-    });
+app.post("/declineClient/:userId", (req, res) => {
+  const { userId } = req.params;
+  console.log("Client id", userId);
+  logMod.declineClient(userId, (err, result) => {
+    if (err) {
+      res.status(500).send("Error declining client");
+    } else {
+      res.status(200).send("Client declined successfully");
+    }
+  });
+});
+
 app.get("/workouts", (req, res) => {
   logMod.getWorkouts((success, result) => {
     if (success) {

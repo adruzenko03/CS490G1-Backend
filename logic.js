@@ -144,4 +144,28 @@ export default class LogicService {
       }
     });
   }
+
+  updateExerciseStatus(exercise_id, actionType, callback) {
+    if (actionType === 'activate') {
+      this.dataMod.activateExercise(exercise_id, (error, result) => {
+        if (error) {
+          console.error('Error activating exercise:', error);
+          callback(error, null);
+        } else {
+          callback(null, result);
+        }
+      });
+    } else if (actionType === 'deactivate') {
+      this.dataMod.deactivateExercise(exercise_id, (error, result) => {
+        if (error) {
+          console.error('Error deactivating exercise:', error);
+          callback(error, null);
+        } else {
+          callback(null, result);
+        }
+      });
+    } else {
+      callback('Invalid  action', null);
+    }
+  }
 }

@@ -170,6 +170,19 @@ app.post('/addExercise', (req, res) => {
   });
 });
 
+app.post('/updateExercise/:exercise_id/:actionType', (req, res) => {
+  const exercise_id = req.params.exercise_id;
+  const actionType = req.params.actionType;
+
+  logMod.updateExerciseStatus(exercise_id, actionType, (err, result) => {
+    if (err) {
+      console.error('Error updating exercise status:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      res.json(result);
+    }
+  });
+});
 
 app.listen(PORT, () => {
   console.log("Listening on port " + PORT);

@@ -78,6 +78,51 @@ export default class LogicService {
     });
   }
 
+    getGoals(callback){
+        this.dataMod.getGoals((res)=>{
+            callback(res)
+        })
+    }
+    removeClient(userId, callback) {
+        this.dataMod.removeClient(userId, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+
+    acceptClient(userId, callback) {
+        this.dataMod.acceptClient(userId, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+
+    declineClient(userId, callback) {
+        this.dataMod.declineClient(userId, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+    
+    getClientRequests(userId, callback){
+        this.dataMod.getRequestedClients(userId, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+    
   getWorkouts(callback) {
     this.dataMod.getWorkouts((error, exercises) => {
       if (error) {

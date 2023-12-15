@@ -110,6 +110,51 @@ app.get("/exercises", (req, res) => {
 
 }); 
 
+app.get('/clientRequestsFetch/:userId', async (req, res) => {
+    const {userId} = req.params;
+    console.log("Made to Server.js via clientRequestsFetch", userId);
+    logMod.getClientRequests(userId, (err, Data) => {
+        if(err){
+            res.status(500).json({ok:false, error: err.message});
+        } else {
+            res.status(200).json({ok:true, Data});
+        }
+    });
+});
+
+app.delete('/removeClient/:userId', (req, res) => {
+    const { userId } = req.params;
+    logMod.removeClient(userId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error removing client');
+        } else {
+            res.status(200).send('Client removed successfully');
+        }
+    });
+});
+
+app.post('/acceptClient/:userId', (req, res) => {
+    const {userId} = req.params;
+    console.log("Client id", userId);
+    logMod.acceptClient(userId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error accepting client');
+        } else {
+            res.status(200).send('Client accepted successfully');
+        }
+    });
+});
+
+app.post('/declineClient/:userId', (req, res) => {
+    const {userId} = req.params;
+    console.log("Client id", userId);
+    logMod.declineClient(userId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error declining client');
+        } else {
+            res.status(200).send('Client declined successfully');
+        }
+    });
 app.get("/workouts", (req, res) => {
   logMod.getWorkouts((success, result) => {
     if (success) {

@@ -146,6 +146,31 @@ app.post('/updateCoachStatus/:coach_id/:actionType', (req, res) => {
   });
 });
 
+app.get('/exerciseList', (req, res) => {
+  logMod.getExerciseList((success, exercises) => {
+    if (success) {
+      res.json(exercises);
+    } else {
+      res.status(500).send('Internal Server Error');
+    }
+  });
+});
+
+app.post('/addExercise', (req, res) => {
+  const { exercise_name, steps, equipmentList } = req.body;
+  if (exercise_name === undefined || steps === undefined || equipmentList === undefined) {
+    res.status(400).json({ error: 'undefined values in request body' });
+  }
+  logMod.addExercise(exercise_name, steps, equipmentList, (success, result) => {
+    if (success) {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  });
+});
+
+
 app.listen(PORT, () => {
   console.log("Listening on port " + PORT);
 });

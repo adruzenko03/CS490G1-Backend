@@ -237,4 +237,26 @@ export default class DatabaseService {
       callback(null, result);
     });
   }
+
+  getExerciseList(callback) {
+    const query = 'SELECT exercises.exercise_id, exercises.exercise_name, GROUP_CONCAT(DISTINCT equipment.equipment_name) AS equipment_list, exercises.steps FROM exercises JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY exercises.exercise_id, exercises.exercise_name, exercises.steps ORDER BY exercises.last_update DESC';
+    this.connection.query(query, (error, results, fields) => {
+      if (error) {
+        
+        return callback(error);
+      }
+      callback(null, results);
+    });
+  }
+  
+  addExercise(exercise_name, steps, equipmentList, callback) {
+    const query = `INSERT INTO exercises (exercise_name, steps) VALUES (?, ?); SET @lastExerciseId = LAST_INSERT_ID(); INSERT INTO exercise_equipment (exercise_id, equipment_id) VALUES ${equipmentList.map(equipment_id => `(@lastExerciseId, ${equipment_id})`).join(', ')};`;
+    this.connection.query(query, [exercise_name, steps], (error, result) => {
+      if (error) {
+        console.error('Error adding exercise and equipment:', error);
+        return callback(error);
+      }
+      callback(null,result)
+    });
+  }
 }

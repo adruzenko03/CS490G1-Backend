@@ -123,4 +123,25 @@ export default class LogicService {
       callback('Invalid  action', null);
     }
   }
+
+  getExerciseList(callback) {
+    this.dataMod.getExerciseList((error, exercises) => {
+      if (error) {
+        console.error("Error retrieving exercise list", error);
+        callback(false, { message: "Error retrieving exercise list" });
+      } else {
+        callback(true, exercises);
+      }
+    });
+  }
+
+  addExercise(exercise_name, steps, equipmentList, callback) {
+    this.dataMod.addExercise(exercise_name, steps, equipmentList, (error, result) => {
+      if (error) {
+        console.error('Error adding exercise:', error);
+      } else {
+        callback(true, result);
+      }
+    });
+  }
 }

@@ -18,6 +18,7 @@ export default class DatabaseService {
       console.log("Database connection established");
     });
   }
+  
   login(username, password, callback) {
     this.connection.query(
       `SELECT * FROM user_auth WHERE email='${username}' and password='${password}'`,
@@ -201,7 +202,7 @@ export default class DatabaseService {
       callback(null, results);
     });
   }
-  
+
   getUserWorkouts(callback) {
     const query =
       "SELECT workouts.workout_id, workouts.workout_name, goals.goal, GROUP_CONCAT(DISTINCT exercises.exercise_name SEPARATOR ', ') AS exercises, workouts.difficulty, GROUP_CONCAT(DISTINCT CONCAT(UCASE(LEFT(muscle_groups.muscle, 1)), SUBSTRING(muscle_groups.muscle, 2)) SEPARATOR ', ') AS muscle_groups, GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_list, user_workouts.user_id FROM workouts JOIN goals ON workouts.goal_id = goals.goal_id JOIN workout_exercises ON workouts.workout_id = workout_exercises.workout_id JOIN exercises ON workout_exercises.exercise_id = exercises.exercise_id JOIN workout_muscle_groups ON workouts.workout_id = workout_muscle_groups.workout_id JOIN muscle_groups ON workout_muscle_groups.muscle_id = muscle_groups.muscle_id JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id JOIN user_workouts ON workouts.workout_id = user_workouts.workout_id GROUP BY workouts.workout_id, workouts.workout_name, goals.goal, workouts.difficulty, user_workouts.user_id;";
@@ -280,63 +281,63 @@ export default class DatabaseService {
       }
     );
   }
-}
-getAcceptedClients(userId, callback){
-  const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'accepted'";
-  //'SELECT u.*, s.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"'; with goal_id(int)
-  //'SELECT u.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"';   without goal_id
 
-  this.connection.query(query, [userId], (err, results) => {
-      if (err) {
-          // If there's a database error, pass it back to the callback
-          callback(err);
-      } else {
-          // If the query is successful, pass the results back to the callback
-          console.log(results);
-          callback(null, results);
-      }
-  });
-}
-removeClient(userId, callback) {
-  const query = 'DELETE FROM coach_client_connections WHERE client_id = ?';
-  this.connection.query(query, [userId], (err, result) => {
-      if (err) {
-          callback(err, null);
-      } else {
-          callback(null, result);
-      }
-  });
-}
-getRequestedClients(userId, callback){
-  const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'pending'";
-  this.connection.query(query, [userId], (err, result) =>{
-      if(err){
-          callback(err, null);
-      } else {
-          callback(null, result);
-      }
-  });
-}
+  getAcceptedClients(userId, callback) {
+    const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'accepted'";
+    //'SELECT u.*, s.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"'; with goal_id(int)
+    //'SELECT u.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"';   without goal_id
 
-acceptClient(userId, callback) {
-  const query = 'UPDATE coach_client_connections SET status = "accepted" WHERE client_id = ?';
-  this.connection.query(query, [userId], (err, result) => {
+    this.connection.query(query, [userId], (err, results) => {
       if (err) {
-          callback(err, null);
+        // If there's a database error, pass it back to the callback
+        callback(err);
       } else {
-          callback(null, result);
+        // If the query is successful, pass the results back to the callback
+        console.log(results);
+        callback(null, results);
       }
-  });
-}
+    });
+  }
+  removeClient(userId, callback) {
+    const query = 'DELETE FROM coach_client_connections WHERE client_id = ?';
+    this.connection.query(query, [userId], (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    });
+  }
+  getRequestedClients(userId, callback) {
+    const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'pending'";
+    this.connection.query(query, [userId], (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    });
+  }
 
-declineClient(userId, callback) {
-  const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ?';
-  this.connection.query(query, [userId], (err, result) => {
+  acceptClient(userId, callback) {
+    const query = 'UPDATE coach_client_connections SET status = "accepted" WHERE client_id = ?';
+    this.connection.query(query, [userId], (err, result) => {
       if (err) {
-          callback(err, null);
+        callback(err, null);
       } else {
-          callback(null, result);
+        callback(null, result);
       }
-  });
-}
+    });
+  }
+
+  declineClient(userId, callback) {
+    const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ?';
+    this.connection.query(query, [userId], (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    });
+  }
 }

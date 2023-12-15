@@ -5,7 +5,7 @@ HOST: temp/
 
 All of the Documentation for the backend for Tru-Fit. If any functionality isn't present, contact a corresponding backend developer to have that functionality created or added to the API
 
-## Questions Collection [/login]
+## Register User [/signup]
 
 ### Register User [POST]
 Registers a new user, takes in a JSON with all available information and puts them into the database
@@ -23,13 +23,6 @@ Registers a new user, takes in a JSON with all available information and puts th
             "state":"NJ",
             "zip":"11223",
             "role":"coach",
-            "currentFitnessLevel":"beginner",
-            "currentDiet":1,
-            "currentExerciseSchedule":"0-2",
-            "fitnessGoal":"gain muscle",
-            //Below are optional for coaches
-            "cost":123,
-            "experience":1
         }
         
 + Response 201 (application/json)
@@ -50,7 +43,9 @@ Registers a new user, takes in a JSON with all available information and puts th
                     }
         }
 
-### Login [GET]
+## Login [/login]
+
+### Login [POST]
 
 Login a user using this action. It takes in the user's email and password in the form of a JSON and returns the user's data
 
@@ -87,4 +82,283 @@ Returns a list containing all the goals and their IDs
         {
             "goalID":1,
             "goal": "Flexibility"
+        }
+        
+        
+## Client Survey [/client-survey]
+
+### Client Survey [POST]
+Takes in User ID and survey info and inserts values into database
+
++ Request (application/json)
+
+        {
+            "userID": 123,
+            "currentFitnessLevel":"beginner",
+            "currentDiet":1,
+            "currentExerciseSchedule":"0-2",
+            "fitnessGoal":"gain muscle",
+        }
+
++ Response 201 (application/json)
+
+        {
+           "user": {
+                        "userID": 123,
+                        "role":"client"
+                    }
+        }
+        
++ Response 500 (application/json)
+
+        {
+           "user": {
+                        "userID": 123,
+                        "role":"client"
+                    }
+        }
+
+## Coach Survey [/coach-survey]
+
+### Coach Survey [POST]
+Takes in User ID and survey info and inserts values into database
+
++ Request (application/json)
+
+        {
+            "userID": 123,
+            "experience": 5,
+            "cost": 50,
+            "goal": 'gain muscle'
+        }
+
++ Response 201 (application/json)
+
+        {
+           "user": {
+                        "userID": 123,
+                        "role":"client"
+                    }
+        }
+        
++ Response 500 (application/json)
+
+        {
+           "user": {
+                        "userID": 123,
+                        "role":"client"
+                    }
+        }
+        
+## Survey [/surveyfetch/:userId]
+
+### Get Survey [GET]
+Given a User ID return the corresponding client survey
+
++ Response 200 (application/json)
+
+        {
+            "surveyData":
+                [{
+                    "user_id":4,
+                    "fitness_level":"beginner",
+                    "diet":3800,
+                    "weekly_exercise":"3-5",
+                    "goal_id":4,
+                    "last_update":"2023-12-11T18:30:06.000Z"
+                }]
+        }
+        
++ Response 500 (application/json)
+
+        {
+            "surveyData":[{}]
+        }
+
+
+## Accepted Clients [/acceptedClients/:userId]
+
+### Get Accepted Clients [GET]
+Given a User ID return the all of this coach's accepted clients
+
++ Response 200 (application/json)
+
+        {
+            "acceptedClients":
+                [{
+                    "user_id": 5,
+                    "first_name": "Willy",
+                    "last_name": "Cheesley",
+                    "phone_number": "2395742160",
+                    "street_address": "12 Union Avenue",
+                    "city": "Lehigh Acres",
+                    "state": "FL",
+                    "zip": "33972",
+                    "role": "client",
+                    "last_update": "2023-12-11T18:30:06.000Z",
+                    "fitness_level": "advanced",
+                    "diet": 1200,
+                    "weekly_exercise": "6-8",
+                    "goal_id": 4,
+                    "goal_description": "enhance flexibility"
+                },
+                ...
+                {
+                    "user_id": 142,
+                    ...
+                    "goal_description": "lose weight"
+                }]
+        }
+        
++ Response 500 (application/json)
+
+        {
+            "acceptedClients":[{}]
+        }
+
+## Pending Clients [/clientRequestsFetch/:userId]
+
+### Get Pending Clients [GET]
+Given a User ID return the all of this coach's pending clients
+
++ Response 200 (application/json)
+
+        {
+            "Data":
+                [{
+                    "user_id": 5,
+                    "first_name": "Willy",
+                    "last_name": "Cheesley",
+                    "phone_number": "2395742160",
+                    "street_address": "12 Union Avenue",
+                    "city": "Lehigh Acres",
+                    "state": "FL",
+                    "zip": "33972",
+                    "role": "client",
+                    "last_update": "2023-12-11T18:30:06.000Z",
+                    "fitness_level": "advanced",
+                    "diet": 1200,
+                    "weekly_exercise": "6-8",
+                    "goal_id": 4,
+                    "goal_description": "enhance flexibility"
+                },
+                ...
+                {
+                    "user_id": 142,
+                    ...
+                    "goal_description": "lose weight"
+                }]
+        }
+        
++ Response 500 (application/json)
+
+        {
+            "acceptedClients":[{}]
+        }
+
+## Exercise [/exercises]
+
+### Get Exercises [GET]
+Gets all exercises
+
+        
++ Response 200 (application/json)
+
+        {
+            "exercises": [
+                {
+                    "exercise_name": "Deadlifts",
+                    "equipment_name": "Barbell",
+                    "steps": "Stand with a barbell or dumbbells in front of your thighs, feet hip-width apart. Hinge at your hips while maintaining a slight bend in your knees, lowering the weights along your legs until you feel a stretch in your hamstrings, then return to the starting position, focusing on your hamstrings and glutes."
+                },
+                ...
+                {
+                    "exercise_name": "Shoulder Press",
+                    "equipment_name": "Barbell",
+                    "steps": "Sit or stand with dumbbells at shoulder height, palms facing your torso. Press the weights overhead while keeping your back straight, then lower them back to shoulder height, engaging your shoulder muscles and deltoids."
+                }
+        }
+        
+        
++ Response 500 (application/json)
+
+        {
+            "message":"Error retrieving exercises"
+        }
+
+## Workout Add [/workoutsadded]
+
+### Workout Add [POST]
+Give a user a premade workout
+
++ Request (application/json)
+
+        {
+            "userID":123,
+            "workoutID": 321
+        }
+
++ Response 201 (application/json)
+
+        {
+            "message": "User workout inserted successfully",
+            "insertID":456
+            
+        }
+        
++ Response 500 (application/json)
+
+        {
+            "message":"Error inserting user workout"
+        }
+
+## Workout Remove [/workoutsremoved]
+
+### Remove Workout [DELETE]
+Remove a workout from a user's profile
+
++ Request (application/json)
+
+        {
+            "userID":123,
+            "workoutID": 321
+        }
+
++ Response 200 (application/json)
+
+        {
+            "message": "User workout removed successfully",
+            
+        }
+        
++ Response 500 (application/json)
+
+        {
+            "message":"Error removed user workout"
+        }
+        
+## Activity Survey [/activitySurvey]
+
+### Record Daily Activities [POST]
+Record all activity of a daily activity
+
++ Request (application/json)
+        
+        {
+            "userID":1123,
+            "calorieIntake":200,
+            "bodyWeight":10
+        }
+        
++ Response 201 (application/json)
+
+        {
+            "message": "Daily activity inserted successfully",
+            "insertID": 4312
+        }
+        
++ Response 500 (application/json)
+
+        {
+            "message":"Error inserting daily activity"
         }

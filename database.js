@@ -5,11 +5,12 @@ export default class DatabaseService {
   constructor() {
     this.connection = mysql.createConnection({
       multipleStatements: true,
-      host: "localhost",
-      user: "root",
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
       password: process.env.DB_PASS,
-      database: "fitness",
+      database: process.env.DB_DB,
     });
+    
     this.connection.connect((err) => {
       if (err) {
         console.error("Error connecting to the database:", err);

@@ -86,7 +86,6 @@ app.get("/acceptedClients/:userId", async (req, res) => {
   });
 });
 
-
 app.get("/exercises", (req, res) => {
   logMod.getExercises((success, result) => {
     if (success) {
@@ -98,7 +97,7 @@ app.get("/exercises", (req, res) => {
     }
   });
 
-});
+}); 
 
 
 app.get('/clientRequestsFetch/:userId', async (req, res) => {
@@ -161,8 +160,9 @@ app.get("/workouts", (req, res) => {
   });
 });
 
-app.get("/myworkouts", (req, res) => {
-  logMod.getUserWorkouts((success, result) => {
+app.get("/myworkouts/:userId", (req, res) => {
+  const userId = req.params.userId;
+  logMod.getUserWorkouts(userId, (success, result) => {
     if (success) {
       res.status(200).json({ ok: true, exercises: result });
     } else {
@@ -170,6 +170,7 @@ app.get("/myworkouts", (req, res) => {
     }
   });
 });
+
 
 app.delete("/workoutsremoved", (req, res) => {
   const { userId, workoutId } = req.body;
@@ -194,9 +195,11 @@ app.post("/workoutsadded", (req, res) => {
   });
 });
 
-app.get("/activities", (req, res) => {
-  logMod.getActivity((status, activities) => {
-    if (status) {
+app.get("/activities/:userId", (req, res) => {
+  const userId = req.params.userId;
+
+  logMod.getActivity(userId,(success, activities) => {
+    if (success) {
       res.status(200).json({ ok: true, activities });
     } else {
       res
@@ -205,6 +208,7 @@ app.get("/activities", (req, res) => {
     }
   });
 });
+ 
 
 app.post("/activitySurvey", (req, res) => {
   const { userId, entryDate, calorieIntake, bodyWeight } = req.body;

@@ -74,7 +74,6 @@ export default class DatabaseService {
       info.zipCode,
       info.role,
     ];
-
     this.connection.query(query, values, (err, results) => {
       if (err) {
         callback(false, err.message, null);

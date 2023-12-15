@@ -202,10 +202,12 @@ export default class DatabaseService {
     });
   }
 
-  getUserWorkouts(callback) {
-    const query =
-      "SELECT workouts.workout_id, workouts.workout_name, goals.goal, GROUP_CONCAT(DISTINCT exercises.exercise_name SEPARATOR ', ') AS exercises, workouts.difficulty, GROUP_CONCAT(DISTINCT CONCAT(UCASE(LEFT(muscle_groups.muscle, 1)), SUBSTRING(muscle_groups.muscle, 2)) SEPARATOR ', ') AS muscle_groups, GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_list, user_workouts.user_id FROM workouts JOIN goals ON workouts.goal_id = goals.goal_id JOIN workout_exercises ON workouts.workout_id = workout_exercises.workout_id JOIN exercises ON workout_exercises.exercise_id = exercises.exercise_id JOIN workout_muscle_groups ON workouts.workout_id = workout_muscle_groups.workout_id JOIN muscle_groups ON workout_muscle_groups.muscle_id = muscle_groups.muscle_id JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id JOIN user_workouts ON workouts.workout_id = user_workouts.workout_id GROUP BY workouts.workout_id, workouts.workout_name, goals.goal, workouts.difficulty, user_workouts.user_id;";
-    this.connection.query(query, (error, results, fields) => {
+  getUserWorkouts(userId, callback) {
+    const query = `
+    SELECT workouts.workout_id, workouts.workout_name, goals.goal, GROUP_CONCAT(DISTINCT exercises.exercise_name SEPARATOR ', ') AS exercises, workouts.difficulty, GROUP_CONCAT(DISTINCT CONCAT(UCASE(LEFT(muscle_groups.muscle, 1)), SUBSTRING(muscle_groups.muscle, 2)) SEPARATOR ', ') AS muscle_groups, GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_list, user_workouts.user_id FROM workouts JOIN goals ON workouts.goal_id = goals.goal_id JOIN workout_exercises ON workouts.workout_id = workout_exercises.workout_id JOIN exercises ON workout_exercises.exercise_id = exercises.exercise_id JOIN workout_muscle_groups ON workouts.workout_id = workout_muscle_groups.workout_id JOIN muscle_groups ON workout_muscle_groups.muscle_id = muscle_groups.muscle_id JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id JOIN user_workouts ON workouts.workout_id = user_workouts.workout_id WHERE user_workouts.user_id = ? GROUP BY workouts.workout_id, workouts.workout_name, goals.goal, workouts.difficulty, user_workouts.user_id;
+  `;
+
+    this.connection.query(query, [userId], (error, results, fields) => {
       if (error) {
         return callback(error);
       }
@@ -243,9 +245,9 @@ export default class DatabaseService {
     });
   }
 
-  getActivity(callback) {
-    const query = "SELECT * FROM daily_activity";
-    this.connection.query(query, (error, results) => {
+  getActivity(userId ,callback) {
+    const query = `SELECT * FROM daily_activity WHERE user_id = ?;`;
+    this.connection.query(query, [userId], (error, results, fields) => {
       if (error) {
         return callback(error);
       }

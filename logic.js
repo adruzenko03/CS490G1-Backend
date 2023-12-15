@@ -89,8 +89,8 @@ export default class LogicService {
     });
   }
 
-  getUserWorkouts(callback) {
-    this.dataMod.getUserWorkouts((error, exercises) => {
+  getUserWorkouts(userId, callback) {
+    this.dataMod.getUserWorkouts(userId, (error, exercises) => {
       if (error) {
         console.error("Error retrieving Workouts", error);
         callback(false, { message: "Error retrieving Workouts" });
@@ -128,8 +128,8 @@ export default class LogicService {
     );
   }
 
-  getActivity(callback) {
-    this.dataMod.getActivity((error, Activities) => {
+  getActivity(userId,callback) {
+    this.dataMod.getActivity(userId, (error, Activities) => {
       if (error) {
         console.error("Error retrieving Activities", error);
         callback(false, { message: "Error retrieving Activities" });

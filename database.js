@@ -345,4 +345,86 @@ export default class DatabaseService {
       }
     });
   }
+
+  getPendingCoaches(callback) {
+    const query =
+      "SELECT users.user_id, users.first_name, users.last_name, coach_survey.experience, coach_survey.goal, coach_survey.cost FROM users JOIN coach_survey ON users.user_id = coach_survey.user_id JOIN coach_status ON coach_status.coach_id = users.user_id WHERE coach_status.status='pending'";
+  
+    this.connection.query(query, (error, results, fields) => {
+      if (error) {
+        return callback(error);
+      }
+      callback(null, results);
+    });
+  }
+
+  acceptCoach(coach_id, callback) {
+    const query = 'UPDATE coach_status SET status = "accepted" WHERE coach_id = ?';
+  
+    this.connection.query(query, [coach_id], (error, result) => {
+      if (error) {
+        console.error('Error updating coach status:', error);
+        return callback(error, null);
+      }
+      callback(null, result);
+    });
+  }
+  
+  declineCoach(coach_id, callback) {
+    const query = 'UPDATE coach_status SET status = "declined" WHERE coach_id = ?';
+  
+    this.connection.query(query, [coach_id], (error, result) => {
+      if (error) {
+        console.error('Error updating coach status:', error);
+        return callback(error, null);
+      }
+      callback(null, result);
+    });
+  }
+
+  getExerciseList(callback) {
+    const query = 'SELECT exercises.status, exercises.exercise_id, exercises.exercise_name, GROUP_CONCAT(DISTINCT equipment.equipment_name) AS equipment_list, exercises.steps FROM exercises JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY exercises.exercise_id, exercises.exercise_name, exercises.steps ORDER BY exercises.last_update DESC';
+    this.connection.query(query, (error, results, fields) => {
+      if (error) {
+        
+        return callback(error);
+      }
+      callback(null, results);
+    });
+  }
+  
+  addExercise(exercise_name, steps, equipmentList, callback) {
+    const query = `INSERT INTO exercises (exercise_name, steps, status) VALUES (?, ?, 'activated'); SET @lastExerciseId = LAST_INSERT_ID(); INSERT INTO exercise_equipment (exercise_id, equipment_id) VALUES ${equipmentList.map(equipment_id => `(@lastExerciseId, ${equipment_id})`).join(', ')};`;
+    this.connection.query(query, [exercise_name, steps], (error, result) => {
+      if (error) {
+        console.error('Error adding exercise and equipment:', error);
+        return callback(error);
+      }
+      callback(null,result)
+    });
+  }
+
+  activateExercise(exercise_id, callback) {
+    const query = 'UPDATE exercises SET status = "activated" WHERE exercise_id = ?';
+  
+    this.connection.query(query, [exercise_id], (error, result) => {
+      if (error) {
+        console.error('Error activating exercise:', error);
+        return callback(error, null);
+      }
+      callback(null, result);
+    });
+  }
+  
+  deactivateExercise(exercise_id, callback) {
+    const query = 'UPDATE exercises SET status = "deactivated" WHERE exercise_id = ?';
+  
+    this.connection.query(query, [exercise_id], (error, result) => {
+      if (error) {
+        console.error('Error deactivating exercise:', error);
+        return callback(error, null);
+      }
+      callback(null, result);
+    });
+  }
 }

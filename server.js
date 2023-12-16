@@ -222,6 +222,67 @@ app.post("/activitySurvey", (req, res) => {
   );
 });
 
+app.get('/pendingCoaches', (req, res) => {
+  logMod.getPendingCoaches((success, coaches) => {
+    if (success) {
+      res.json(coaches);
+    } else {
+      res.status(500).send('Internal Server Error');
+    }
+  });
+});
+
+app.post('/updateCoachStatus/:coach_id/:actionType', (req, res) => {
+  const coach_id = req.params.coach_id;
+  const actionType = req.params.actionType;
+
+  logMod.updateCoachStatus(coach_id, actionType, (err, result) => {
+    if (err) {
+      console.error('Error updating coach status:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      res.json(result);
+    }
+  });
+});
+
+app.get('/exerciseList', (req, res) => {
+  logMod.getExerciseList((success, exercises) => {
+    if (success) {
+      res.json(exercises);
+    } else {
+      res.status(500).send('Internal Server Error');
+    }
+  });
+});
+
+app.post('/addExercise', (req, res) => {
+  const { exercise_name, steps, equipmentList } = req.body;
+  if (exercise_name === undefined || steps === undefined || equipmentList === undefined) {
+    res.status(400).json({ error: 'undefined values in request body' });
+  }
+  logMod.addExercise(exercise_name, steps, equipmentList, (success, result) => {
+    if (success) {
+      res.status(200).json(result);
+    } else {
+      res.status(500).json(result);
+    }
+  });
+});
+
+app.post('/updateExercise/:exercise_id/:actionType', (req, res) => {
+  const exercise_id = req.params.exercise_id;
+  const actionType = req.params.actionType;
+
+  logMod.updateExerciseStatus(exercise_id, actionType, (err, result) => {
+    if (err) {
+      console.error('Error updating exercise status:', err);
+      res.status(500).send('Internal Server Error');
+    } else {
+      res.json(result);
+    }
+  });
+});
 
 app.listen(PORT, () => {
     console.log("Listening on port " + PORT);

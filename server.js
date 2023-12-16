@@ -1,9 +1,10 @@
 import express from "express";
 import LogicService from "./logic.js";
 import cors from "cors";
+import DatabaseService from "./database.js";
 
 let logMod = new LogicService();
-
+let dataMod= new DatabaseService()
 const app = express();
 const PORT = process.env.PORT || 3001;
 app.use(cors());
@@ -98,6 +99,7 @@ app.get("/exercises", (req, res) => {
 
 }); 
 
+
 app.get('/clientRequestsFetch/:userId', async (req, res) => {
     const {userId} = req.params;
     console.log("Made to Server.js via clientRequestsFetch", userId);
@@ -110,6 +112,7 @@ app.get('/clientRequestsFetch/:userId', async (req, res) => {
     });
 });
 
+//ALL CLIENTS BELOW ARE NOT DOCUMENTED
 app.delete('/removeClient/:userId', (req, res) => {
     const { userId } = req.params;
     logMod.removeClient(userId, (err, result) => {
@@ -227,5 +230,5 @@ app.post("/activitySurvey", (req, res) => {
 
 
 app.listen(PORT, () => {
-  console.log("Listening on port " + PORT);
-});
+    console.log("Listening on port " + PORT);
+})

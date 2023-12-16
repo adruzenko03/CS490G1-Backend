@@ -3,13 +3,16 @@ import "dotenv/config.js";
 
 export default class DatabaseService {
   constructor() {
-    this.connection = mysql.createConnection({
-      multipleStatements: true,
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      database: process.env.DB_DB,
-    });
+    this.connection = mysql.createConnection(
+      {
+        multipleStatements: true,
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_DB,
+        port:process.env.DB_PORT
+      }
+    );
     
     this.connection.connect((err) => {
       if (err) {

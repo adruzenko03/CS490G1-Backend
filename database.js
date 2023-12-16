@@ -286,6 +286,9 @@ export default class DatabaseService {
 
 
 
+      /******************************* GLENS CODE  */
+
+
 //  -------------------------------------------------------------------------
 
 
@@ -929,53 +932,3 @@ export default class DatabaseService {
    
 
 }
-
-/*
-UPDATE fitness.workout_muscle_groups 
-SET muscle_id = ?
-WHERE workout_id = ? and muscle_id = ?;
-
-
-
-
-
-
- sendWorkoutData(workoutData, callback) {
-
-        const query = `INSERT INTO workouts (workout_name, goal_id, difficulty) VALUES (?, ?, ?)`;
-        const last_id = `SET @last_workout_id = LAST_INSERT_ID();`
-
-        this.connection.query(query, [workoutData.workout_name,workoutData.goal_id, workoutData.difficulty], (err1, results1) => {
-            if (err1) {
-                console.error("Error executing the first insert: ", err1);
-                callback(false, err1.message, null);
-            } else {
-                console.log("Workout details updated: ", results1);
-                // Second query for updating workout_muscle_groups
-                const query2 = `INSERT INTO user_workouts (user_id, workout_id) VALUES (?, ?);`;
-                
-                this.connection.query(query2, [workoutData.client_id, last_id], (err2, results2) => {
-                    if (err2) {
-                        console.error("Error executing the second statement: ", err2);
-                        callback(false, err2.message, null);
-                    } else {
-                        console.log("Muscle groups updated: ", results2);
-                        const query3 = `START TRANSACTION; 
-                                        SET @last_workout_id = LAST_INSERT_ID(); 
-                                        INSERT INTO workout_muscle_groups (workout_id, muscle_id) VALUES (?, ?); 
-                                        COMMIT;`;
-                        
-                        this.connection.query(query3, [last_id, workoutData.muscle_id], (err3, results3) => {
-                            if (err2) {
-                                console.error("Error executing the second statement: ", err3);
-                                callback(false, err3.message, null);
-                            } else {
-                                console.log("Muscle groups updated: ", results3);
-                            }
-                        });
-                    }
-                });
-            }
-        });
-    }
-*/

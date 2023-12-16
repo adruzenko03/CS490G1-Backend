@@ -206,6 +206,8 @@ export default class LogicService {
     );
   }
 
+  /***** GLENS CODE >*********************************************** */
+
   getGoalsList(callback){
     this.dataMod.getGoalsList((error, surveyData)=>{
       if(error){
@@ -402,7 +404,6 @@ export default class LogicService {
       }
     })
   }
-  
   deleteCurrentCoach(connectionId, callback){
     this.dataMod.deleteCurrentCoach(connectionId, (success, message)=>{
       if(success){

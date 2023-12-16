@@ -76,6 +76,20 @@ app.post("/client-survey", async (req, res) => {
     });
   });
 
+
+/* Ja's Code */
+app.get("/acceptedClients/:userId", async (req, res) => {
+    const { userId } = req.params;
+    console.log("Made to Server.js via acceptedClients", userId);
+    dataMod.getAcceptedClients(userId, (err, acceptedClients) => {
+      if (err) {
+        res.status(500).json({ ok: false, error: err.message });
+      } else {
+        res.status(200).json({ ok: true, acceptedClients });
+      }
+    });
+  });
+
 app.get("/exercises", (req, res) => {
     logMod.getExercises((success, result) => {
       if (success) {
@@ -88,6 +102,21 @@ app.get("/exercises", (req, res) => {
     });
   });
 
+
+  // ------------------_----------------–---------------------------------------
+
+
+app.get('/clientRequestsFetch/:coachId', (req, res)=>{
+    const {coachId} = req.params;
+    // console.log("Made to Server.js", coachId);
+    logMod.getPendingClientRequests(coachId, (success, result)=>{
+        if(success){
+            res.status(200).json({ ok: true, surveyData: result});
+        }else{
+            res.status(500).json({ ok: false, message: "Error fetching reuqests" });
+        }
+    })
+})
   
 
 app.delete('/removeClient/:userId', (req, res) => {
@@ -148,18 +177,6 @@ app.post('/declineClient/:userId', (req, res) => {
     });
   });
 
-/* Ja's Code */
-app.get("/acceptedClients/:userId", async (req, res) => {
-    const { userId } = req.params;
-    console.log("Made to Server.js via acceptedClients", userId);
-    dataMod.getAcceptedClients(userId, (err, acceptedClients) => {
-      if (err) {
-        res.status(500).json({ ok: false, error: err.message });
-      } else {
-        res.status(200).json({ ok: true, acceptedClients });
-      }
-    });
-  });
 
   app.delete("/workoutsremoved", (req, res) => {
     const { userId, workoutId } = req.body;
@@ -216,7 +233,13 @@ app.get("/acceptedClients/:userId", async (req, res) => {
     );
   });
 
-  /*Glen's code */
+
+
+
+
+
+
+/* GLENS CODE ************************************ */
 
 
 
@@ -431,20 +454,7 @@ app.put('/acceptClientRequest/:connectionId', (req, res)=>{
         }
     })
 })
-// ------------------_----------------–---------------------------------------
 
-
-app.get('/clientRequestsFetch/:coachId', (req, res)=>{
-    const {coachId} = req.params;
-    // console.log("Made to Server.js", coachId);
-    logMod.getPendingClientRequests(coachId, (success, result)=>{
-        if(success){
-            res.status(200).json({ ok: true, surveyData: result});
-        }else{
-            res.status(500).json({ ok: false, message: "Error fetching reuqests" });
-        }
-    })
-})
 
 // ------------------_----------------–---------------------------------------
 
@@ -559,11 +569,11 @@ app.get("/exercisesList", async (req, res) => {
 app.put('/updateExercise/:workoutId', async(req, res)=>{
     const workoutId = req.params.workoutId;
     const data = req.body;
-    logMod.changeExercise(workoutId, data, (success, message)=>{
-        if(success){
-            res.status(200).json({ ok: true, message: 'Exercise successfully updated.' });
-        }else{
-            res.status(400).json({ ok: false, message });
+    logMod.changeExercise(workoutId, data, (err, result)=>{
+        if (err) {
+            res.status(500).send('Error declining client');
+        } else {
+            res.status(200).send('Client declined successfully');
         }
     })
 })
@@ -591,11 +601,11 @@ app.post('/addNewExercise/:workoutId', async (req, res) => {
     const workoutId = req.params.workoutId;
     const data = req.body;
     console.log('-------------------------------', workoutId);
-    logMod.addNewExercise(workoutId, data, (success, message) => {
-        if (success) {
-            res.status(201).json({ ok: true, message: 'Exercise successfully added' });
+    logMod.addNewExercise(workoutId, data, (err, result) => {
+        if (err) {
+            res.status(500).send('Error adding exercise client');
         } else {
-            res.status(400).json({ ok: false, message });
+            res.status(200).send('Exercise added successfully');
         }
     });
 });

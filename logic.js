@@ -402,6 +402,16 @@ export default class LogicService {
       }
     })
   }
+  
+  deleteCurrentCoach(connectionId, callback){
+    this.dataMod.deleteCurrentCoach(connectionId, (success, message)=>{
+      if(success){
+        callback(true, message);
+      }else{
+        callback(false, {message: "Error deleting user workout"});
+      }
+    })
+  }
 
   sendWorkoutData(workoutId, data, callback){
     this.dataMod.sendWorkoutData(workoutId, data, (error, surveyData)=>{
@@ -450,8 +460,8 @@ export default class LogicService {
   }
 
 
-  udpateExercise(workoutId, data, callback){
-    this.dataMod.updateExercise(workoutId, data, (error, surveyData)=>{
+  changeExercise(workoutId, data, callback){
+    this.dataMod.changeExercise(workoutId, data, (error, surveyData)=>{
       if(error){
         console.log("Error sending updating exercise: ", error);
         callback(false, {message:"Error sending updating exercise"});

@@ -284,23 +284,10 @@ export default class DatabaseService {
         );
       }
 
-      /// TWO DEFINITIONS FOR THE getAcceptedClients ??????? ////
-    //   getAcceptedClients(userId, callback) {
-    //     const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'accepted'";
-    //     //'SELECT u.*, s.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"'; with goal_id(int)
-    //     //'SELECT u.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"';   without goal_id
-    
-    //     this.connection.query(query, [userId], (err, results) => {
-    //       if (err) {
-    //         // If there's a database error, pass it back to the callback
-    //         callback(err);
-    //       } else {
-    //         // If the query is successful, pass the results back to the callback
-    //         console.log(results);
-    //         callback(null, results);
-    //       }
-    //     });
-    //   }
+
+
+//  -------------------------------------------------------------------------
+
 
     removeClient(userId, callback) {
         const query = 'DELETE FROM coach_client_connections WHERE client_id = ?';
@@ -313,42 +300,9 @@ export default class DatabaseService {
         });
       }
 
-      getRequestedClients(userId, callback) {
-        const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'pending'";
-        this.connection.query(query, [userId], (err, result) => {
-          if (err) {
-            callback(err, null);
-          } else {
-            callback(null, result);
-          }
-        });
-      }
-
-      acceptClient(userId, callback) {
-        const query = 'UPDATE coach_client_connections SET status = "accepted" WHERE client_id = ?';
-        this.connection.query(query, [userId], (err, result) => {
-          if (err) {
-            callback(err, null);
-          } else {
-            callback(null, result);
-          }
-        });
-      }
-
-      declineClient(userId, callback) {
-        const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ?';
-        this.connection.query(query, [userId], (err, result) => {
-          if (err) {
-            callback(err, null);
-          } else {
-            callback(null, result);
-          }
-        });
-      }
+//  -------------------------------------------------------------------------
 
 
-
-    
 
 
 //  -------------------------------------------------------------------------
@@ -803,7 +757,7 @@ export default class DatabaseService {
 // -----------------------------------–---------------------------------------
 
 
-    updateExercise(workoutId, data, callback){
+    changeExercise(workoutId, data, callback){
         const query = `UPDATE fitness.workout_exercises
                         SET exercise_id = ?
                         WHERE workout_id = ? and exercise_id = ?;`

@@ -407,7 +407,19 @@ app.delete('/deleteCoachRequest/:requestId', (req, res) => {
 
 // ------------------_----------------–---------------------------------------
 
+app.delete('/deleteCurrentCoach/:connectionId', (req, res) => {
+    const { connectionId } = req.params;
+    logMod.deleteCurrentCoach(connectionId, (success, message) => {
+        if (success) {
+            res.status(200).json({ ok: true, message: 'Coach successfully deleted' });
+        } else {
+            res.status(500).json({ ok: false, message });
+        }
+    });
+});
 
+
+// ------------------_----------------–---------------------------------------
 
 app.put('/acceptClientRequest/:connectionId', (req, res)=>{
     const connectionId = req.params.connectionId;
@@ -547,7 +559,7 @@ app.get("/exercisesList", async (req, res) => {
 app.put('/updateExercise/:workoutId', async(req, res)=>{
     const workoutId = req.params.workoutId;
     const data = req.body;
-    logMod.updateExercise(workoutId, data, (success, message)=>{
+    logMod.changeExercise(workoutId, data, (success, message)=>{
         if(success){
             res.status(200).json({ ok: true, message: 'Exercise successfully updated.' });
         }else{
@@ -555,6 +567,7 @@ app.put('/updateExercise/:workoutId', async(req, res)=>{
         }
     })
 })
+
 
 // -----------------------------------–---------------------------------------
 

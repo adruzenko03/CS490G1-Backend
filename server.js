@@ -144,7 +144,7 @@ app.post('/declineClient/:userId', (req, res) => {
         }
     });
 });
-
+ 
 app.get("/workouts", (req, res) => {
   logMod.getWorkouts((success, result) => {
     if (success) {

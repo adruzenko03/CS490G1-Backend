@@ -77,12 +77,6 @@ export default class LogicService {
       }
     });
   }
-
-    getGoals(callback){
-        this.dataMod.getGoals((res)=>{
-            callback(res)
-        })
-    }
     removeClient(userId, callback) {
         this.dataMod.removeClient(userId, (err, result) => {
             if (err) {

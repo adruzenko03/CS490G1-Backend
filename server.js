@@ -32,12 +32,6 @@ app.post("/login", (req, res) => {
   });
 });
 
-app.get("/goals", (req, res) => {
-  logMod.getGoals((resp) => {
-    res.status(200).send(resp);
-  });
-});
-
 app.post("/coach-survey", async (req, res) => {
   const surveyData = req.body;
   console.log("Coach Survey Data:", surveyData);

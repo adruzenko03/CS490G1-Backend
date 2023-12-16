@@ -78,6 +78,51 @@ export default class LogicService {
     });
   }
 
+    getGoals(callback){
+        this.dataMod.getGoals((res)=>{
+            callback(res)
+        })
+    }
+    removeClient(userId, callback) {
+        this.dataMod.removeClient(userId, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+
+    acceptClient(userId, callback) {
+        this.dataMod.acceptClient(userId, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+
+    declineClient(userId, callback) {
+        this.dataMod.declineClient(userId, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+    
+    getClientRequests(userId, callback){
+        this.dataMod.getRequestedClients(userId, (err, result) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+    
   getWorkouts(callback) {
     this.dataMod.getWorkouts((error, exercises) => {
       if (error) {
@@ -87,5 +132,77 @@ export default class LogicService {
         callback(true, exercises);
       }
     });
+  }
+
+  getUserWorkouts(userId, callback) {
+    this.dataMod.getUserWorkouts(userId, (error, exercises) => {
+      if (error) {
+        console.error("Error retrieving Workouts", error);
+        callback(false, { message: "Error retrieving Workouts" });
+      } else {
+        callback(true, exercises);
+      }
+    });
+  }
+
+  deleteUserWorkout(userId, workoutId, callback) {
+    this.dataMod.deleteUserWorkout(
+      userId,
+      workoutId,
+      (success, message, insertId) => {
+        if (success) {
+          callback(true, message, insertId);
+        } else {
+          callback(false, { message: "Error inserting user workout" });
+        }
+      }
+    );
+  }
+
+  insertUserWorkout(userId, workoutId, callback) {
+    this.dataMod.insertUserWorkout(
+      userId,
+      workoutId,
+      (success, message, insertId) => {
+        if (success) {
+          callback(true, message, insertId);
+        } else {
+          callback(false, { message: "Error inserting user workout" });
+        }
+      }
+    );
+  }
+
+  getActivity(userId,callback) {
+    this.dataMod.getActivity(userId, (error, Activities) => {
+      if (error) {
+        console.error("Error retrieving Activities", error);
+        callback(false, { message: "Error retrieving Activities" });
+      } else {
+        callback(true, Activities);
+      }
+    });
+  }
+
+  insertUserDailyActivity(
+    userId,
+    entryDate,
+    calorieIntake,
+    bodyWeight,
+    callback
+  ) {
+    this.dataMod.insertUserDailyActivity(
+      userId,
+      entryDate,
+      calorieIntake,
+      bodyWeight,
+      (success, message, insertId) => {
+        if (success) {
+          callback(true, message, insertId);
+        } else {
+          callback(false, { message: "Error inserting user daily activity" });
+        }
+      }
+    );
   }
 }

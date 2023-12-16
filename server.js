@@ -1,10 +1,10 @@
 import  express from 'express';
 import LogicService from './logic.js';
 import cors from 'cors'
-import DatabaseService from './database.js';
+
 
 let logMod=new LogicService()
-let dataMod = new DatabaseService()
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 //TODO: Make cors only apply to routes that need it
@@ -76,17 +76,77 @@ app.post("/client-survey", async (req, res) => {
     });
   });
 
-app.get('/clientRequestsFetch/:coachId', async(req, res)=>{
-    const {coachId} = req.params;
-    console.log("Made to Server.js", coachId);
-    dataMod.getPendingClientRequests(coachId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
+app.get("/exercises", (req, res) => {
+    logMod.getExercises((success, result) => {
+      if (success) {
+        res.status(200).json({ ok: true, exercises: result });
+      } else {
+        res
+          .status(500)
+          .json({ ok: false, message: "Error retrieving exercises" });
+      }
+    });
+  });
+
+  
+
+app.delete('/removeClient/:userId', (req, res) => {
+    const { userId } = req.params;
+    logMod.removeClient(userId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error removing client');
+        } else {
+            res.status(200).send('Client removed successfully');
         }
-    })
-})
+    });
+});
+
+app.post('/acceptClient/:userId', (req, res) => {
+    const {userId} = req.params;
+    console.log("Client id", userId);
+    logMod.acceptClient(userId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error accepting client');
+        } else {
+            res.status(200).send('Client accepted successfully');
+        }
+    });
+});
+
+app.post('/declineClient/:userId', (req, res) => {
+    const {userId} = req.params;
+    console.log("Client id", userId);
+    logMod.declineClient(userId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error declining client');
+        } else {
+            res.status(200).send('Client declined successfully');
+        }
+    });
+});
+  
+  app.get("/workouts", (req, res) => {
+    logMod.getWorkouts((success, result) => {
+      if (success) {
+        res.status(200).json({ ok: true, exercises: result });
+      } else {
+        res
+          .status(500)
+          .json({ ok: false, message: "Error retrieving workouts" });
+      }
+    });
+  });
+
+  app.get("/myworkouts/:userId", (req, res) => {
+    const userId = req.params.userId;
+    logMod.getUserWorkouts(userId, (success, result) => {
+      if (success) {
+        res.status(200).json({ ok: true, exercises: result });
+      } else {
+        res.status(500).json({ ok: false, message: "Error retrieving workouts" });
+      }
+    });
+  });
 
 /* Ja's Code */
 app.get("/acceptedClients/:userId", async (req, res) => {
@@ -101,161 +161,257 @@ app.get("/acceptedClients/:userId", async (req, res) => {
     });
   });
 
-  /*Glen's code */
-app.get('/acceptedClients2/:coachId', async(req, res)=>{
-    const {coachId} = req.params;
-    console.log("Made to Server.js", coachId);
-    dataMod.getAcceptedClients2(coachId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-        }
-    })
-})
+  app.delete("/workoutsremoved", (req, res) => {
+    const { userId, workoutId } = req.body;
+  
+    logMod.deleteUserWorkout(userId, workoutId, (success, message, insertId) => {
+      if (success) {
+        res.status(200).json({ ok: true, message });
+      } else {
+        res.status(500).json({ ok: false, message });
+      }
+    });
+  });
 
+  app.post("/workoutsadded", (req, res) => {
+    const { userId, workoutId } = req.body;
+    logMod.insertUserWorkout(userId, workoutId, (success, message, insertId) => {
+      if (success) {
+        res.status(201).json({ ok: true, message, insertId });
+      } else {
+        res.status(500).json({ ok: false, message });
+      }
+    });
+  });
 
-app.get('/goalsList', async(req, res)=>{
-    console.log("Made to Server.js");
-    dataMod.getGoalsList((err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-        }
-    })
-})
-app.get('/experienceList', async(req, res)=>{
-    console.log("Made to Server.js");
-    dataMod.getExperienceList((err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-        }
-    })
-})
-app.get('/locationList', async(req, res)=>{
-    console.log("Made to Server.js");
-    dataMod.getLocationList((err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-        }
-    })
-})
-app.get('/costList', async(req, res)=>{
-    console.log("Made to Server.js");
-    dataMod.getPriceList((err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-        }
-    })
-})
-app.get('/coachList', async(req, res)=>{
-    console.log("Made to Server.js");
-    dataMod.getCoachList((err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-        }
-    })
-})
-app.get('/acceptedCoach/:clientId', async(req, res)=>{
-    const {clientId} = req.params;
-    console.log("Made to Server.js", clientId);
-    dataMod.getAcceptedCoach(clientId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
-        }
-    })
-})
-app.get('/pendingCoach/:clientId', async(req, res)=>{
-    const {clientId} = req.params;
-    console.log("Made to Server.js", clientId);
-    dataMod.getPendingCoach(clientId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
-        }
-    })
-})
+  app.get("/activities/:userId", (req, res) => {
+    const userId = req.params.userId;
+  
+    logMod.getActivity(userId,(success, activities) => {
+      if (success) {
+        res.status(200).json({ ok: true, activities });
+      } else {
+        res
+          .status(500)
+          .json({ ok: false, message: "Error retrieving activities" });
+      }
+    });
+  });
 
-app.get('/clientWorkouts/:clientId', async(req, res)=>{
-    const {clientId} = req.params;
-    console.log("Made to Server.js", clientId);
-    dataMod.getClientWorkouts(clientId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
-        }
-    })
-})
-
-app.get('/clientInfo/:clientId', async(req, res)=>{
-    const {clientId} = req.params;
-    console.log("Made to Server.js", clientId);
-    dataMod.getClientInfo(clientId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
-        }
-    })
-})
-
-
-app.get('/cityList', async(req, res)=>{
-    console.log("Made to Server.js");
-    dataMod.getLocationList((err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-        }
-    })
-})
-
-app.post('/requestCoach',async (req, res) => {
-    const {clientId, items} = req.body;
-    dataMod.requestCoach(clientId, items, (success, message) => {
+  app.post("/activitySurvey", (req, res) => {
+    const { userId, entryDate, calorieIntake, bodyWeight } = req.body;
+  
+    logMod.insertUserDailyActivity(
+      userId,
+      entryDate,
+      calorieIntake,
+      bodyWeight,
+      (success, message, insertId) => {
         if (success) {
-            res.status(201).json({ ok: true, message: 'Request successfully sent' });
+          res.status(201).json({ ok: true, message, insertId });
         } else {
-            res.status(400).json({ ok: false, message });
+          res.status(500).json({ ok: false, message });
+        }
+      }
+    );
+  });
+
+  /*Glen's code */
+
+
+
+app.get('/goalsList', (req, res)=>{
+    // console.log("Made to Server.js");
+    logMod.getGoalsList((success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res
+                .status(500)
+                .json({ok: false, message: "Error retrieving exercises."})
+        }
+    })
+})
+//  -------------------------------------------------------------------------
+
+app.get('/experienceList', (req, res)=>{
+    // console.log("Made to Server.js");
+    logMod.getExperienceList((success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res
+                .status(500)
+                .json({ok: false, message: "Error retrieving experience list."})
+        }
+    })
+})
+
+//  -------------------------------------------------------------------------
+
+app.get('/locationList', (req, res)=>{
+    // console.log("Made to Server.js");
+    logMod.getLocationList((success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res
+                .status(500)
+                .json({ok: false, message: "Error retrieving Location list."})
+        }
+    })
+})
+
+//  -------------------------------------------------------------------------
+
+
+app.get('/costList', (req, res)=>{
+    // console.log("Made to Server.js");
+    logMod.getPriceList((success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            
+            res
+                .status(500)
+                .json({ok: false, message:"Error retrieving CostList."})
+        }
+    })
+})
+
+//  -------------------------------------------------------------------------
+
+app.get('/coachList', (req, res)=>{
+    // console.log("Made to Server.js");
+    logMod.getCoachList((success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res
+                .status(500)
+                .json({ok: false, message:"Error retrieving coach list."})
+        }
+    })
+})
+
+// ------------------_----------------–---------------------------------------
+
+app.get('/acceptedCoach/:clientId', (req, res)=>{
+    const {clientId} = req.params;
+    // console.log("Made to Server.js", clientId);
+    logMod.getAcceptedCoach(clientId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res.status(500).json({ok:false, message: "Error retrieving accepted coaches."});
+        }
+    })
+})
+
+// ------------------_----------------–---------------------------------------
+app.get('/clientInfo/:clientId', (req, res)=>{
+    const {clientId} = req.params;
+    // console.log("Made to Server.js", clientId);
+    logMod.getClientInfo(clientId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res.status(500).json({ok:false, message: "Error retrieving client info."});
+        }
+    })
+})
+
+// ------------------_----------------–---------------------------------------
+
+app.get('/pendingCoach/:clientId', (req, res)=>{
+    const {clientId} = req.params;
+    // console.log("Made to Server.js", clientId);
+    logMod.getPendingCoach(clientId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res.status(500).json({ok:false, message: "Error retrieving pending coaches."});
+        }
+    })
+})
+
+// ------------------_----------------–---------------------------------------
+
+app.get('/clientWorkouts/:clientId', (req, res)=>{
+    const {clientId} = req.params;
+    // console.log("Made to Server.js", clientId);
+    logMod.getClientWorkouts(clientId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res.status(500).json({ok:false, message: "Error retrieving client workouts."});
+        }
+    })
+})
+
+// ------------------_----------------–---------------------------------------
+
+
+
+// app.get('/cityList', async(req, res)=>{
+//     console.log("Made to Server.js");
+//     dataMod.getLocationList((err, surveyData)=>{
+//         if(err){
+//             res.status(500).json({ok:false, error:err.message});
+//         }else{
+//             res.status(200).json({ok:true, surveyData});
+//         }
+//     })
+// })
+
+app.post('/requestCoach', (req, res) => {
+    const {clientId, items} = req.body;
+    logMod.requestCoach(clientId, items, (success, result) => {
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res.status(500).json({ok:false, message: "Error requesting coach."});
         }
     });
 });
 
+// ------------------_----------------–---------------------------------------
+
+app.get('/exerciseCount/:workoutId', (req, res)=>{
+    const {workoutId} = req.params;
+    // console.log("Made to Server.js", workoutId);
+    logMod.getExerciseCount(workoutId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
+        }else{
+            res.status(500).json({ok:false, message: "Error requesting exercise count."});
+        }
+    })
+})
 
 
-app.delete('/deleteCoachRequest/:requestId', async (req, res) => {
+// ------------------_----------------–---------------------------------------
+
+
+app.delete('/deleteCoachRequest/:requestId', (req, res) => {
     const requestId = req.params;
 
-    dataMod.deleteCoachRequest(requestId, (success, message) => {
+    logMod.deleteCoachRequest(requestId, (success, message) => {
         if (success) {
             res.status(200).json({ ok: true, message: 'Request successfully deleted' });
         } else {
-            res.status(400).json({ ok: false, message });
+            res.status(500).json({ ok: false, message });
         }
     });
 });
 
-app.put('/acceptClientRequest/:connectionId', async(req, res)=>{
+// ------------------_----------------–---------------------------------------
+
+
+
+app.put('/acceptClientRequest/:connectionId', (req, res)=>{
     const connectionId = req.params.connectionId;
-    dataMod.acceptClientRequest(connectionId, (success, message)=>{
+    logMod.acceptClientRequest(connectionId, (success, message)=>{
         if(success){
             res.status(200).json({ ok: true, message: 'Request successfully accepted.' });
         }else{
@@ -263,9 +419,41 @@ app.put('/acceptClientRequest/:connectionId', async(req, res)=>{
         }
     })
 })
+// ------------------_----------------–---------------------------------------
+
+
+app.get('/clientRequestsFetch/:coachId', (req, res)=>{
+    const {coachId} = req.params;
+    // console.log("Made to Server.js", coachId);
+    logMod.getPendingClientRequests(coachId, (success, result)=>{
+        if(success){
+            res.status(200).json({ ok: true, surveyData: result});
+        }else{
+            res.status(500).json({ ok: false, message: "Error fetching reuqests" });
+        }
+    })
+})
+
+// ------------------_----------------–---------------------------------------
+
+
+app.get('/acceptedClients2/:coachId', (req, res)=>{
+    const {coachId} = req.params;
+    // console.log("Made to Server.js", coachId);
+    logMod.getAcceptedClients2(coachId, (success, result)=>{
+        if(success){
+            res.status(200).json({ ok: true, surveyData: result });
+        }else{
+            res.status(400).json({ ok: false, message: "Error fetching accepted clients" });
+        }
+    })
+})
+
+// ------------------_----------------–---------------------------------------
+
 app.put('/declineClientRequest/:connectionId', async(req, res)=>{
     const connectionId = req.params.connectionId;
-    dataMod.declineClientRequest(connectionId, (success, message)=>{
+    logMod.declineClientRequest(connectionId, (success, message)=>{
         if(success){
             res.status(200).json({ ok: true, message: 'Request successfully declined.' });
         }else{
@@ -273,25 +461,32 @@ app.put('/declineClientRequest/:connectionId', async(req, res)=>{
         }
     })
 })
+
+
+// ------------------_----------------–---------------------------------------
 
 app.delete('/deleteClient/:connectionId', async (req, res) => {
     const connectionId = req.params;
 
-    dataMod.deleteClient(connectionId, (success, message) => {
+    logMod.deleteClient(connectionId, (success, message) => {
         if (success) {
-            res.status(200).json({ ok: true, message: 'Request successfully deleted' });
+            res.status(200).json({ ok: true, message: 'Client successfully deleted' });
         } else {
             res.status(400).json({ ok: false, message });
         }
     });
 });
+
+// ------------------_----------------–---------------------------------------
+
+
 
 app.put('/sendWorkoutData/:workoutId', async(req, res)=>{
     const workoutId = req.params.workoutId;
     const data = req.body;
-    dataMod.sendWorkoutData(workoutId, data, (success, message)=>{
+    logMod.sendWorkoutData(workoutId, data, (success, message)=>{
         if(success){
-            res.status(200).json({ ok: true, message: 'Request successfully declined.' });
+            res.status(200).json({ ok: true, message: 'Workout data successfully sent.' });
         }else{
             res.status(400).json({ ok: false, message });
         }
@@ -299,85 +494,13 @@ app.put('/sendWorkoutData/:workoutId', async(req, res)=>{
 })
 
 
-app.get('/exerciseCount/:workoutId', async(req, res)=>{
-    const {workoutId} = req.params;
-    console.log("Made to Server.js", workoutId);
-    dataMod.getExerciseCount(workoutId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
-        }
-    })
-})
+// ------------------_----------------–---------------------------------------
 
-app.get('/allExercises/:workoutId', async(req, res)=>{
-    const {workoutId} = req.params;
-    console.log("Made to Server.js", workoutId);
-    dataMod.getAllExercises(workoutId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
-        }
-    })
-})
-
-app.get('/exercisesList', async(req, res)=>{
-    console.log("Made to Server.js");
-    dataMod.getExercisesList((err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
-        }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
-        }
-    })
-})
-
-
-app.put('/updateExercise/:workoutId', async(req, res)=>{
-    const workoutId = req.params.workoutId;
-    const data = req.body;
-    dataMod.updateExercise(workoutId, data, (success, message)=>{
-        if(success){
-            res.status(200).json({ ok: true, message: 'Exercise successfully updated.' });
-        }else{
-            res.status(400).json({ ok: false, message });
-        }
-    })
-})
-
-app.delete('/deleteExercise/:workoutId', async (req, res) => {
-    const workoutId = req.params.workoutId;
-    const data = req.body;
-    dataMod.deleteExercise(workoutId, data, (success, message) => {
-        if (success) {
-            res.status(200).json({ ok: true, message: 'Exercise successfully deleted' });
-        } else {
-            res.status(400).json({ ok: false, message });
-        }
-    });
-});
-
-app.post('/addNewExercise/:workoutId',async (req, res) => {
-    const workoutId = req.params.workoutId;
-    const data = req.body;
-    dataMod.addNewExercise(workoutId, data, (success, message) => {
-        if (success) {
-            res.status(201).json({ ok: true, message: 'Exercise successfully added' });
-        } else {
-            res.status(400).json({ ok: false, message });
-        }
-    });
-});
 
 app.post('/sendNewWorkoutData', async (req, res) => {
     const workoutData = req.body;
-    console.log('Coach Survey Data:', workoutData);
-    dataMod.sendNewWorkoutData(workoutData, (success, message) => {
+    // console.log('Coach Survey Data:', workoutData);
+    logMod.sendNewWorkoutData(workoutData, (success, message) => {
         if (success) {
             res.status(201).json({ ok: true, message });
         } else {
@@ -386,10 +509,92 @@ app.post('/sendNewWorkoutData', async (req, res) => {
     });
 });
 
+// ------------------_----------------–---------------------------------------
+
+
+app.get('/allExercises/:workoutId', async(req, res)=>{
+    const {workoutId} = req.params;
+    // console.log('*************************', workoutId);
+    // console.log("Made to Server.js", workoutId);
+    logMod.getAllExercises(workoutId, (success, result)=>{
+        if(success){
+            res.status(200).json({ ok: true, surveyData: result });
+        }else{
+            res.status(400).json({ ok: false, message: "Error fetching exercises" });
+        }
+    })
+})
+
+// ------------------_----------------–---------------------------------------
+
+app.get("/exercisesList", async (req, res) => {
+    logMod.getExercisesList((success, result) => {
+      if (success) {
+        res.status(200).json({ ok: true, surveyData: result });
+      } else {
+        res
+          .status(500)
+          .json({ ok: false, message: "Error retrieving exercises" });
+      }
+    });
+  
+  }); 
+
+
+// -----------------------------------–---------------------------------------
+
+
+app.put('/updateExercise/:workoutId', async(req, res)=>{
+    const workoutId = req.params.workoutId;
+    const data = req.body;
+    logMod.updateExercise(workoutId, data, (success, message)=>{
+        if(success){
+            res.status(200).json({ ok: true, message: 'Exercise successfully updated.' });
+        }else{
+            res.status(400).json({ ok: false, message });
+        }
+    })
+})
+
+// -----------------------------------–---------------------------------------
+
+
+app.delete('/deleteExercise/:workoutId', async (req, res) => {
+    const workoutId = req.params.workoutId;
+    const data = req.body;
+    logMod.deleteExercise(workoutId, data, (success, message) => {
+        if (success) {
+            res.status(200).json({ ok: true, message: 'Exercise successfully deleted' });
+        } else {
+            res.status(400).json({ ok: false, message });
+        }
+    });
+});
+
+// -----------------------------------–---------------------------------------
+
+
+app.post('/addNewExercise/:workoutId', async (req, res) => {
+    const workoutId = req.params.workoutId;
+    const data = req.body;
+    console.log('-------------------------------', workoutId);
+    logMod.addNewExercise(workoutId, data, (success, message) => {
+        if (success) {
+            res.status(201).json({ ok: true, message: 'Exercise successfully added' });
+        } else {
+            res.status(400).json({ ok: false, message });
+        }
+    });
+});
+
+
+// -----------------------------------–---------------------------------------
+
+
 app.delete('/deleteOneWorkout/:workoutId', async (req, res) => {
     const workoutId = req.params.workoutId;
 
-    dataMod.deleteOneWorkout(workoutId, (success, message) => {
+    logMod.deleteOneWorkout(workoutId, (success, message) => {
         if (success) {
             res.status(200).json({ ok: true, message: 'Request successfully deleted' });
         } else {
@@ -398,66 +603,88 @@ app.delete('/deleteOneWorkout/:workoutId', async (req, res) => {
     });
 });
 
+// -----------------------------------–---------------------------------------
+
+
 app.get('/messages/chat/:coachId', async(req, res)=>{
     const coachId = req.params.coachId;
-    dataMod.getMessages(coachId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
+    logMod.getMessages(coachId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
         }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
+            res
+                .status(500)
+                .json({ok:false, message:"Error retrieving messages"});
         }
     })
 })
 
+// -----------------------------------–---------------------------------------
+
+
+
 app.get('/messages/coach/:coachId', async(req, res)=>{
     const coachId = req.params.coachId;
-    dataMod.getAllChats(coachId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
+    logMod.getAllChats(coachId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
         }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
+            res
+                .status(500)
+                .json({ok:false, message:"Error retrieving chats"});
         }
     })
 })
+
+// -----------------------------------–---------------------------------------
+
 
 app.get('/users1/:chatId/:coachId', async(req, res)=>{
     const chatId = req.params.chatId;
     const coachId = req.params.coachId;
-    dataMod.getSideNames(chatId, coachId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
+    logMod.getSideNames(chatId, coachId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
         }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
+            res
+                .status(500)
+                .json({ok:false, message:"Error retrieving names"});
         }
     })
 })
+
+// -----------------------------------–---------------------------------------
 
 
 app.get('/messages1/chat/:chatId', async(req, res)=>{
     const chatId = req.params.chatId;
-    dataMod.getOneSpecificChat(chatId, (err, surveyData)=>{
-        if(err){
-            res.status(500).json({ok:false, error:err.message});
+    logMod.getOneSpecificChat(chatId, (success, result)=>{
+        if(success){
+            res.status(200).json({ok:true, surveyData: result});
         }else{
-            res.status(200).json({ok:true, surveyData});
-            console.log(surveyData);
+            res
+                .status(500)
+                .json({ok:false, message:"Error messages for chat"});
         }
     })
 })
 
+// -----------------------------------–---------------------------------------
+
+
 app.post('/newMessage',async (req, res) => {
     const data = req.body;
-    dataMod.sendNewMessage(data, (success, message) => {
+    logMod.sendNewMessage(data, (success, message) => {
         if (success) {
-            res.status(201).json({ ok: true, message: 'Message successfully sent' });
+            res.status(201).json({ ok: true, message: 'Exercise successfully added' });
         } else {
             res.status(400).json({ ok: false, message });
         }
     });
 });
+
+
+/* GLENS FUNCTIONS ********************************************************* */
 
 app.listen(PORT,()=>{
     console.log("Listening on port "+ PORT)

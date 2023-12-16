@@ -163,22 +163,6 @@ export default class DatabaseService {
         });
       }
 
-    getPendingClientRequests(coachId, callback){
-        const query = `SELECT * 
-        FROM fitness.coach_client_connections AS ccc
-        JOIN users ON users.user_id = ccc.client_id 
-        JOIN survey ON survey.user_id = users.user_id
-        JOIN goals ON goals.goal_id = survey.goal_id
-        WHERE ccc.coach_id = ? AND ccc.status = 'pending';`;
-        this.connection.query(query, [coachId], (err, results)=>{
-            if(err){
-                callback(err);
-            }else{
-                console.log(results);
-                callback(null, results);
-            }
-        })
-    }
 
     /* JA's code */
     getAcceptedClients(userId, callback) {
@@ -196,102 +180,261 @@ export default class DatabaseService {
         });
       }
 
-      /*Glen's Code*/
-    getAcceptedClients2(coachId, callback){
-        const query = `SELECT * 
-        FROM fitness.coach_client_connections AS ccc
-        JOIN users ON users.user_id = ccc.client_id 
-        JOIN survey ON survey.user_id = users.user_id
-        JOIN goals ON goals.goal_id = survey.goal_id
-        WHERE ccc.coach_id = ? AND ccc.status = 'accepted';`;
-        this.connection.query(query, [coachId], (err, results)=>{
-            if(err){
-                callback(err);
+      getExercises(callback) {
+        const query =
+          "SELECT exercises.exercise_name, equipment.equipment_name, exercises.steps FROM exercises INNER JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id INNER JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id";
+    
+        this.connection.query(query, (error, results, fields) => {
+          if (error) {
+            return callback(error);
+          }
+          callback(null, results);
+        });
+      }
+
+      getWorkouts(callback) {
+        const query =
+          "SELECT workouts.workout_id, workouts.workout_name, goals.goal, GROUP_CONCAT(DISTINCT exercises.exercise_name SEPARATOR ', ') AS exercises, workouts.difficulty, GROUP_CONCAT(DISTINCT CONCAT(UCASE(LEFT(muscle_groups.muscle, 1)), SUBSTRING(muscle_groups.muscle, 2)) SEPARATOR ', ') AS muscle_groups, GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_list FROM workouts JOIN goals ON workouts.goal_id = goals.goal_id JOIN workout_exercises ON workouts.workout_id = workout_exercises.workout_id JOIN exercises ON workout_exercises.exercise_id = exercises.exercise_id JOIN workout_muscle_groups ON workouts.workout_id = workout_muscle_groups.workout_id JOIN muscle_groups ON workout_muscle_groups.muscle_id = muscle_groups.muscle_id JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY workouts.workout_id, workouts.workout_name, goals.goal, workouts.difficulty;";
+        this.connection.query(query, (error, results, fields) => {
+          if (error) {
+            return callback(error);
+          }
+          callback(null, results);
+        });
+      }
+
+      getUserWorkouts(userId, callback) {
+        const query = `
+        SELECT workouts.workout_id, workouts.workout_name, goals.goal, GROUP_CONCAT(DISTINCT exercises.exercise_name SEPARATOR ', ') AS exercises, workouts.difficulty, GROUP_CONCAT(DISTINCT CONCAT(UCASE(LEFT(muscle_groups.muscle, 1)), SUBSTRING(muscle_groups.muscle, 2)) SEPARATOR ', ') AS muscle_groups, GROUP_CONCAT(DISTINCT equipment.equipment_name SEPARATOR ', ') AS equipment_list, user_workouts.user_id FROM workouts JOIN goals ON workouts.goal_id = goals.goal_id JOIN workout_exercises ON workouts.workout_id = workout_exercises.workout_id JOIN exercises ON workout_exercises.exercise_id = exercises.exercise_id JOIN workout_muscle_groups ON workouts.workout_id = workout_muscle_groups.workout_id JOIN muscle_groups ON workout_muscle_groups.muscle_id = muscle_groups.muscle_id JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id JOIN user_workouts ON workouts.workout_id = user_workouts.workout_id WHERE user_workouts.user_id = ? GROUP BY workouts.workout_id, workouts.workout_name, goals.goal, workouts.difficulty, user_workouts.user_id;
+      `;
+    
+        this.connection.query(query, [userId], (error, results, fields) => {
+          if (error) {
+            return callback(error);
+          }
+          callback(null, results);
+        });
+      }
+
+      deleteUserWorkout(userId, workoutId, callback) {
+        const deleteQuery =
+          "DELETE FROM user_workouts WHERE user_id = ? AND workout_id = ?";
+    
+        this.connection.query(deleteQuery, [userId, workoutId], (err, results) => {
+          if (err) {
+            console.error("Error deleting user workout:", err);
+            callback(false, err.message);
+          } else {
+            console.log("User workout deleted successfully");
+            callback(true, "User workout deleted successfully");
+          }
+        });
+      }
+
+      insertUserWorkout(userId, workoutId, callback) {
+        const insertQuery =
+          "INSERT INTO user_workouts (user_id, workout_id) VALUES (?, ?)";
+    
+        this.connection.query(insertQuery, [userId, workoutId], (err, results) => {
+          if (err) {
+            console.error("Error inserting user workout:", err);
+            callback(false, err.message);
+          } else {
+            console.log("User workout inserted successfully");
+            callback(true, "User workout inserted successfully", results.insertId);
+          }
+        });
+      }
+
+      getActivity(userId, callback) {
+        const query = `SELECT * FROM daily_activity WHERE user_id = ?;`;
+        this.connection.query(query, [userId], (error, results, fields) => {
+          if (error) {
+            return callback(error);
+          }
+          callback(null, results);
+        });
+      }
+
+      insertUserDailyActivity(
+        userId,
+        entryDate,
+        calorieIntake,
+        bodyWeight,
+        callback
+      ) {
+        const insertQuery =
+          "INSERT INTO daily_activity (user_id, entry_date, calorie_intake, body_weight) VALUES (?, ?, ?, ?)";
+        this.connection.query(
+          insertQuery,
+          [userId, entryDate, calorieIntake, bodyWeight],
+          (err, results) => {
+            if (err) {
+              console.error("Error inserting daily activity:", err);
+              callback(false, err.message);
+            } else {
+              console.log("Daily activity inserted successfully");
+              callback(
+                true,
+                "Daily activity inserted successfully",
+                results.insertId
+              );
+            }
+          }
+        );
+      }
+
+      /// TWO DEFINITIONS FOR THE getAcceptedClients ??????? ////
+    //   getAcceptedClients(userId, callback) {
+    //     const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'accepted'";
+    //     //'SELECT u.*, s.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"'; with goal_id(int)
+    //     //'SELECT u.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"';   without goal_id
+    
+    //     this.connection.query(query, [userId], (err, results) => {
+    //       if (err) {
+    //         // If there's a database error, pass it back to the callback
+    //         callback(err);
+    //       } else {
+    //         // If the query is successful, pass the results back to the callback
+    //         console.log(results);
+    //         callback(null, results);
+    //       }
+    //     });
+    //   }
+
+    removeClient(userId, callback) {
+        const query = 'DELETE FROM coach_client_connections WHERE client_id = ?';
+        this.connection.query(query, [userId], (err, result) => {
+          if (err) {
+            callback(err, null);
+          } else {
+            callback(null, result);
+          }
+        });
+      }
+
+      getRequestedClients(userId, callback) {
+        const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'pending'";
+        this.connection.query(query, [userId], (err, result) => {
+          if (err) {
+            callback(err, null);
+          } else {
+            callback(null, result);
+          }
+        });
+      }
+
+      acceptClient(userId, callback) {
+        const query = 'UPDATE coach_client_connections SET status = "accepted" WHERE client_id = ?';
+        this.connection.query(query, [userId], (err, result) => {
+          if (err) {
+            callback(err, null);
+          } else {
+            callback(null, result);
+          }
+        });
+      }
+
+      declineClient(userId, callback) {
+        const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ?';
+        this.connection.query(query, [userId], (err, result) => {
+          if (err) {
+            callback(err, null);
+          } else {
+            callback(null, result);
+          }
+        });
+      }
+
+
+
+    
+
+
+//  -------------------------------------------------------------------------
+    getGoalsList(callback){
+        const query = `SELECT DISTINCT goal FROM coach_survey;`
+        this.connection.query(query, (error,results, fields)=>{
+            if(error){
+                return callback(error);
             }else{
-                console.log(results);
                 callback(null, results);
             }
         })
     }
 
-    getGoalsList(callback){
-        const query = `SELECT DISTINCT goal
-        FROM coach_survey;`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
-            }else{
-                console.log(results);
-                callback(null, results)
-            }
-        })
-    }
+//  -------------------------------------------------------------------------
 
     getExperienceList(callback){
         const query = `SELECT DISTINCT experience FROM coach_survey
                         ORDER BY experience`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
+        this.connection.query(query, (error,results, fields)=>{
+            if(error){
+                return callback(error);
             }else{
-                console.log(results);
                 callback(null, results)
             }
         })
     }
+
+//  -------------------------------------------------------------------------
+
     getLocationList(callback){
         const query = `SELECT DISTINCT state FROM users WHERE role='coach'
                         ORDER BY state;`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
+        this.connection.query(query, (error,results, fields)=>{
+            if(error){
+               return callback(error);
             }else{
-                console.log(results);
                 callback(null, results)
             }
         })
     }
 
-    getCityList(callback){
-        const query = `SELECT DISTINCT city FROM users WHERE role='coach'
-                        ORDER BY city;`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
-            }else{
-                console.log(results);
-                callback(null, results)
-            }
-        })
-    }
+//  -------------------------------------------------------------------------
 
+    // getCityList(callback){
+    //     const query = `SELECT DISTINCT city FROM users WHERE role='coach'
+    //                     ORDER BY city;`
+    //     this.connection.query(query, (err,results)=>{
+    //         if(err){
+    //             callback(err);
+    //         }else{
+    //             console.log(results);
+    //             callback(null, results)
+    //         }
+    //     })
+    // }
+
+//  -------------------------------------------------------------------------
 
     getPriceList(callback){
         const query = `SELECT DISTINCT cost FROM coach_survey
                         ORDER BY cost;`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
-            }else{
-                console.log(results);
-                callback(null, results)
-            }
+        this.connection.query(query, (error,results)=>{
+            if(error){
+                return callback(error);
+             }else{
+                 callback(null, results)
+             }
         })
     }
+
+//  -------------------------------------------------------------------------
 
     getCoachList(callback){
         const query = `SELECT * FROM fitness.coach_survey JOIN users ON coach_survey.user_id = users.user_id;`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
-            }else{
-                console.log(results);
-                callback(null, results)
-            }
+        this.connection.query(query, (error,results)=>{
+            if(error){
+                return callback(error);
+             }else{
+                 callback(null, results)
+             }
         })
     }
 
 
+//  -------------------------------------------------------------------------
 
     getAcceptedCoach(clientId, callback){
         const query = `SELECT * 
@@ -299,15 +442,35 @@ export default class DatabaseService {
         JOIN coach_survey ON coach_survey.user_id = coach_client_connections.coach_id
         JOIN users on users.user_id = coach_client_connections.coach_id
         WHERE coach_client_connections.client_id = ? AND coach_client_connections.status = 'accepted'`
-        this.connection.query(query,[clientId], (err,results)=>{
-            if(err){
-                callback(err);
+        this.connection.query(query, [clientId], (error,results)=>{
+            if(error){
+                return callback(error);
             }else{
                 // console.log(results);
                 callback(null, results)
             }
         })
     }
+
+//  -------------------------------------------------------------------------
+
+    getClientInfo(clientId, callback){
+        const query = `SELECT * FROM fitness.users 
+        JOIN survey on survey.user_id = users.user_id
+        JOIN goals on goals.goal_id = survey.goal_id
+        WHERE users.role = 'client' and users.user_id= ?;`
+        this.connection.query(query,[clientId], (error,results)=>{
+            if(error){
+                callback(error);
+            }else{
+                // console.log(results);
+                callback(null, results)
+            }
+        })
+    }
+
+
+//  -------------------------------------------------------------------------
 
     getPendingCoach(clientId, callback){
         const query = `SELECT *
@@ -316,15 +479,17 @@ export default class DatabaseService {
                         JOIN users on users.user_id = coach_client_connections.coach_id
                         WHERE coach_client_connections.client_id = ? AND coach_client_connections.status = 'pending';
                         `
-        this.connection.query(query,[clientId], (err,results)=>{
-            if(err){
-                callback(err);
+        this.connection.query(query,[clientId], (error,results)=>{
+            if(error){
+                callback(error);
             }else{
                 // console.log(results);
                 callback(null, results)
             }
         })
     }
+
+//  -------------------------------------------------------------------------
 
     getClientWorkouts(clientId, callback){
         const query = `
@@ -365,9 +530,9 @@ export default class DatabaseService {
             workouts.workout_id;
     
         `
-        this.connection.query(query,[clientId], (err,results)=>{
-            if(err){
-                callback(err);
+        this.connection.query(query,[clientId], (error,results)=>{
+            if(error){
+                callback(error);
             }else{
                 // console.log(results);
                 callback(null, results)
@@ -375,20 +540,7 @@ export default class DatabaseService {
         })
     }
 
-    getClientInfo(clientId, callback){
-        const query = `SELECT * FROM fitness.users 
-        JOIN survey on survey.user_id = users.user_id
-        JOIN goals on goals.goal_id = survey.goal_id
-        WHERE users.role = 'client' and users.user_id= ?;`
-        this.connection.query(query,[clientId], (err,results)=>{
-            if(err){
-                callback(err);
-            }else{
-                // console.log(results);
-                callback(null, results)
-            }
-        })
-    }
+  //  -------------------------------------------------------------------------
 
 
     requestCoach(clientId, items, callback) {
@@ -398,16 +550,34 @@ export default class DatabaseService {
         const values = [clientId, items.user_id];
         // console.log(values);
     
-        this.connection.query(query, values,  (err, results) => {
-            if (err) {
-                console.error("Error inserting into database: ", err);
-                callback(false, err.message, null);
+        this.connection.query(query, values,  (error, results) => {
+            if (error) {
+                console.error("Error inserting into database: ", error);
+                callback(false, error.message, null);
             } else {
                 console.log("Results from database.js: ", results);
                 callback(true, 'Signup Coach successful');
             }
         });
     }
+
+ //  -------------------------------------------------------------------------
+
+
+ getExerciseCount(workoutId, callback){
+    const query = `SELECT COUNT(*) AS exercise_count FROM fitness.workout_exercises WHERE workout_id = ${workoutId};`
+    this.connection.query(query, (err,results)=>{
+        if(err){
+            callback(err);
+        }else{
+            // console.log(results);
+            callback(null, results)
+        }
+    })
+}
+
+ //  -------------------------------------------------------------------------
+
 
     deleteCoachRequest(requestId, callback){
         const query = `DELETE FROM fitness.coach_client_connections WHERE coach_client_id = (?);`
@@ -423,19 +593,8 @@ export default class DatabaseService {
         })
     }
 
-    deleteCurrentCoach(connectionId, callback){
-        this.connection.query(
-            `DELETE FROM fitness.coach_client_connections WHERE status='accepted' AND coach_client_id = ${connectionId};`,
-            (err1) => {
-                if (err1) {
-                    callback(err1);
-                } else {
-                    console.log("Deletion was successful");
-                    // callback(true, 'Delete was successful');
-                }
-            }
-        );
-    }
+ //  -------------------------------------------------------------------------
+
 
     acceptClientRequest(connectionId, callback){
         const query = `UPDATE fitness.coach_client_connections
@@ -454,6 +613,64 @@ export default class DatabaseService {
         })
     }
 
+ //  -------------------------------------------------------------------------
+
+    deleteCurrentCoach(connectionId, callback){
+        this.connection.query(
+            `DELETE FROM fitness.coach_client_connections WHERE status='accepted' AND coach_client_id = ${connectionId};`,
+            (err1) => {
+                if (err1) {
+                    callback(err1);
+                } else {
+                    console.log("Deletion was successful");
+                    // callback(true, 'Delete was successful');
+                }
+            }
+        );
+    }
+
+     //  -------------------------------------------------------------------------
+
+    getPendingClientRequests(coachId, callback){
+        const query = `SELECT * 
+        FROM fitness.coach_client_connections AS ccc
+        JOIN users ON users.user_id = ccc.client_id 
+        JOIN survey ON survey.user_id = users.user_id
+        JOIN goals ON goals.goal_id = survey.goal_id
+        WHERE ccc.coach_id = ? AND ccc.status = 'pending';`;
+        this.connection.query(query, [coachId], (err, results)=>{
+            if(err){
+                callback(err);
+            }else{
+                console.log(results);
+                callback(null, results);
+            }
+        })
+    }
+
+//  -------------------------------------------------------------------------
+
+    
+      /*Glen's Code*/
+      getAcceptedClients2(coachId, callback){
+        const query = `SELECT * 
+        FROM fitness.coach_client_connections AS ccc
+        JOIN users ON users.user_id = ccc.client_id 
+        JOIN survey ON survey.user_id = users.user_id
+        JOIN goals ON goals.goal_id = survey.goal_id
+        WHERE ccc.coach_id = ? AND ccc.status = 'accepted';`;
+        this.connection.query(query, [coachId], (err, results)=>{
+            if(err){
+                callback(err);
+            }else{
+                console.log(results);
+                callback(null, results);
+            }
+        })
+    }
+
+//  -------------------------------------------------------------------------
+
     declineClientRequest(connectionId, callback){
         const query = `UPDATE fitness.coach_client_connections
                         SET status = 'declined' 
@@ -471,6 +688,9 @@ export default class DatabaseService {
         })
     }
 
+//  -------------------------------------------------------------------------
+
+
     deleteClient(connectionId, callback){
         const query = `DELETE FROM fitness.coach_client_connections WHERE coach_client_id = (?);`
 
@@ -484,6 +704,9 @@ export default class DatabaseService {
             }
         })
     }
+
+// ------------------_----------------–---------------------------------------
+
 
 
     sendWorkoutData(workoutId, data, callback) {
@@ -520,87 +743,8 @@ export default class DatabaseService {
         });
     }
 
-    getExerciseCount(workoutId, callback){
-        const query = `SELECT COUNT(*) AS exercise_count FROM fitness.workout_exercises WHERE workout_id = ${workoutId};`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
-            }else{
-                // console.log(results);
-                callback(null, results)
-            }
-        })
-    }
-    getAllExercises(workoutId, callback){
-        const query = `SELECT * FROM fitness.workout_exercises 
-                        JOIN exercises on exercises.exercise_id = workout_exercises.exercise_id
-                        WHERE workout_id = ${workoutId};`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
-            }else{
-                // console.log(results);
-                callback(null, results)
-            }
-        })
-    }
+// ------------------_----------------–---------------------------------------
 
-    getExercisesList(callback){
-        const query = `SELECT * FROM fitness.exercises`
-        this.connection.query(query, (err,results)=>{
-            if(err){
-                callback(err);
-            }else{
-                console.log(results);
-                callback(null, results)
-            }
-        })
-    }
-    
-    updateExercise(workoutId, data, callback){
-        const query = `UPDATE fitness.workout_exercises
-                        SET exercise_id = ?
-                        WHERE workout_id = ? and exercise_id = ?;`
-
-        this.connection.query(query, [data.selectedId, workoutId, data.oldExerciseId], (err, results)=>{
-            // console.log(connectionId);
-            if(err){
-                console.error("Error updating database: ", err);
-                callback(false, err.message, null);
-            }else{
-                console.log("Results from database.js: ", results);
-                callback(true, 'Request acceptance was successful.');
-            }
-        })
-    }
-    
-    deleteExercise(workoutId, data, callback){
-        const query = `DELETE FROM fitness.workout_exercises WHERE workout_id = ? and exercise_id = ?;`
-
-        this.connection.query(query, [workoutId, data.oldExerciseId], (err, results)=>{
-            if(err){
-                console.error("Error deleting from database: ", err);
-                callback(false, err.message, null);
-            }else{
-                console.log("Results from database.js: ", results);
-                callback(true, 'Delete was successful');
-            }
-        })
-    }
-
-    addNewExercise(workoutId, data, callback) {
-        const query = `INSERT INTO workout_exercises (workout_id, exercise_id) VALUES (?, ?);`;
-
-        this.connection.query(query, [workoutId, data.selectedId],  (err, results) => {
-            if (err) {
-                console.error("Error inserting into database: ", err);
-                callback(false, err.message, null);
-            } else {
-                console.log("Results from database.js: ", results);
-                callback(true, 'Successful addition of exercise');
-            }
-        });
-    }
 
     sendNewWorkoutData(workoutData, callback) {
         const query = `START TRANSACTION;
@@ -622,6 +766,97 @@ export default class DatabaseService {
         });
     }
 
+// ------------------_----------------–---------------------------------------
+
+
+   
+    getAllExercises(workoutId, callback){
+        const query = `SELECT * FROM fitness.workout_exercises 
+                        JOIN exercises on exercises.exercise_id = workout_exercises.exercise_id
+                        WHERE workout_id = ${workoutId};`
+        this.connection.query(query, (err,results,fields)=>{
+            if(err){
+                // callback(err);
+            }else{
+                // console.log(results);
+                callback(null, results)
+            }
+        })
+    }
+
+
+// ------------------_----------------–---------------------------------------
+
+
+    getExercisesList(callback) {
+        const query =
+          "SELECT * FROM fitness.exercises";
+    
+        this.connection.query(query, (error, results, fields) => {
+          if (error) {
+            return callback(error);
+          }
+          callback(null, results);
+        });
+      }
+
+// -----------------------------------–---------------------------------------
+
+
+    updateExercise(workoutId, data, callback){
+        const query = `UPDATE fitness.workout_exercises
+                        SET exercise_id = ?
+                        WHERE workout_id = ? and exercise_id = ?;`
+
+        this.connection.query(query, [data.selectedId, workoutId, data.oldExerciseId], (err, results)=>{
+            // console.log(connectionId);
+            if(err){
+                console.error("Error updating database: ", err);
+                callback(false, err.message, null);
+            }else{
+                console.log("Results from database.js: ", results);
+                callback(true, 'Request acceptance was successful.');
+            }
+        })
+    }
+
+// -----------------------------------–---------------------------------------
+
+    
+    deleteExercise(workoutId, data, callback){
+        const query = `DELETE FROM fitness.workout_exercises WHERE workout_id = ? and exercise_id = ?;`
+
+        this.connection.query(query, [workoutId, data.oldExerciseId], (err, results)=>{
+            if(err){
+                console.error("Error deleting from database: ", err);
+                callback(false, err.message, null);
+            }else{
+                console.log("Results from database.js: ", results);
+                callback(true, 'Delete was successful');
+            }
+        })
+    }
+
+// -----------------------------------–---------------------------------------
+
+
+    addNewExercise(workoutId, data, callback) {
+        const query = `INSERT INTO workout_exercises (workout_id, exercise_id) VALUES (?, ?);`;
+
+        this.connection.query(query, [workoutId, data.selectedId],  (err, results) => {
+            if (err) {
+                console.error("Error inserting into database: ", err);
+                callback(false, err.message);
+            } else {
+                console.log("Results from database.js: ", results);
+                callback(true, 'Successful addition of exercise');
+            }
+        });
+    }
+
+// -----------------------------------–---------------------------------------
+
+   
     deleteOneWorkout(workoutId, callback){
         const query = `DELETE FROM user_workouts WHERE workout_id = ?;
                         DELETE FROM workout_exercises WHERE workout_id = ?;
@@ -640,6 +875,9 @@ export default class DatabaseService {
         })
     }
 
+// -----------------------------------–---------------------------------------
+
+
     getMessages(coachId, callback){
         const query = `SELECT * FROM coach_client_message WHERE sender_id = ? OR receiver_id = ?`
         this.connection.query(query,[coachId, coachId], (err,results)=>{
@@ -651,6 +889,9 @@ export default class DatabaseService {
             }
         })
     }
+
+// -----------------------------------–---------------------------------------
+
 
     getAllChats(coachId, callback){
         const query = `WITH RankedMessages AS (
@@ -673,6 +914,9 @@ export default class DatabaseService {
         })
     }
 
+// -----------------------------------–---------------------------------------
+
+
     getSideNames(chatId, coachId, callback){
         const query = `SELECT DISTINCT users.first_name, users.last_name, users.role
                         FROM users 
@@ -689,6 +933,9 @@ export default class DatabaseService {
         })
     }
 
+// -----------------------------------–---------------------------------------
+
+
     getOneSpecificChat(chatId, callback){
         const query = `SELECT * FROM coach_client_message WHERE coach_client_id = ?;`
         this.connection.query(query,[chatId], (err,results)=>{
@@ -700,6 +947,8 @@ export default class DatabaseService {
             }
         })
     }
+// -----------------------------------–---------------------------------------
+
 
     sendNewMessage(data, callback) {
         const query = "INSERT INTO coach_client_message (`message`, `coach_client_id`, `sender_id`, `receiver_id`, `last_update`) VALUES (?)";
@@ -721,6 +970,7 @@ export default class DatabaseService {
             }
         });
     }
+// -----------------------------------–---------------------------------------
 
    
 

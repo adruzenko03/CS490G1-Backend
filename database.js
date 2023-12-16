@@ -3,18 +3,12 @@ import "dotenv/config.js";
 
 export default class DatabaseService {
   constructor() {
-    console.log(process.env.DB_HOST)
-    console.log(process.env.DB_DB)
-    console.log(process.env.DB_PASS)
-    console.log(process.env.DB_USER)
-    console.log(process.env.DB_PORT)
-    console.log()
     this.connection = mysql.createConnection(
       {
         multipleStatements: true,
         host: process.env.DB_HOST,
         user: process.env.DB_USER,
-        password: process.env.DB_PASS,
+        password: process.env.PASS,
         database: process.env.DB_DB,
         port:process.env.DB_PORT
       }

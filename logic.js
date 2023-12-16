@@ -158,7 +158,6 @@ export default class LogicService {
       }
     );
   }
-
   insertUserWorkout(userId, workoutId, callback) {
     this.dataMod.insertUserWorkout(
       userId,

@@ -257,11 +257,11 @@ app.get('/exerciseList', (req, res) => {
 });
 
 app.post('/addExercise', (req, res) => {
-  const { exercise_name, steps, equipmentList } = req.body;
-  if (exercise_name === undefined || steps === undefined || equipmentList === undefined) {
+  const { exercise_name, muscle, steps, equipmentList } = req.body;
+  if (exercise_name === undefined || muscle === undefined || steps === undefined || equipmentList === undefined) {
     res.status(400).json({ error: 'undefined values in request body' });
   }
-  logMod.addExercise(exercise_name, steps, equipmentList, (success, result) => {
+  logMod.addExercise(exercise_name, muscle, steps, equipmentList, (success, result) => {
     if (success) {
       res.status(200).json(result);
     } else {

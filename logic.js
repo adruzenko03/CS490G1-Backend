@@ -246,8 +246,8 @@ export default class LogicService {
     });
   }
 
-  addExercise(exercise_name, steps, equipmentList, callback) {
-    this.dataMod.addExercise(exercise_name, steps, equipmentList, (error, result) => {
+  addExercise(exercise_name, muscle, steps, equipmentList, callback) {
+    this.dataMod.addExercise(exercise_name, muscle, steps, equipmentList, (error, result) => {
       if (error) {
         console.error('Error adding exercise:', error);
       } else {

@@ -285,5 +285,5 @@ app.post('/updateExercise/:exercise_id/:actionType', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log("Listening on port " + PORT);
+    console.log("Listening on port " + PORT);
 })

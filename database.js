@@ -18,7 +18,15 @@ export default class DatabaseService {
         console.error("Error connecting to the database:", err);
         return;
       }
-      console.log("Database connection established");
+      setInterval(()=>{this.connection.query('select * from goals',(err) => {
+        if (err) {
+          console.error("Error connecting to the database:", err);
+          return;
+        }
+        console.log("Database connection pinged");
+        }); 
+        
+      }, 100000);
       }); 
       
     

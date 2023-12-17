@@ -1,9 +1,10 @@
 import express from "express";
 import LogicService from "./logic.js";
 import cors from "cors";
+import DatabaseService from "./database.js";
 
 let logMod = new LogicService();
-
+let dataMod = new DatabaseService();
 const app = express();
 const PORT = process.env.PORT || 3001;
 app.use(cors());
@@ -88,11 +89,11 @@ app.get("/acceptedClients/:userId", async (req, res) => {
 app.get("/clientRequestsFetch/:userId", async (req, res) => {
   const { userId } = req.params;
   console.log("Made to Server.js via clientRequestsFetch", userId);
-  dataMod.getSurveyData(userId, (err, surveyData) => {
+  logMod.getClientRequests(userId, (err, Data) => {
     if (err) {
       res.status(500).json({ ok: false, error: err.message });
     } else {
-      res.status(200).json({ ok: true, surveyData });
+      res.status(200).json({ ok: true, Data });
     }
   });
 });
@@ -168,6 +169,29 @@ app.get("/workouts", (req, res) => {
     }
   });
 });
+
+app.get('/clientWorkoutLog/:clientId', (req, res) => {
+    const { clientId } = req.params;
+    logMod.getClientWorkoutLog(clientId, (err, workoutLog) => {
+        if (err) {
+            res.status(500).send('Error fetching workout log');
+        } else {
+            res.status(200).json(workoutLog);
+        }
+    });
+});
+
+app.get('/clientDailySurvey/:clientId', (req, res) => {
+    const { clientId } = req.params;
+    logMod.getClientDailySurvey(clientId, (err, dailySurvey) => {
+        if (err) {
+            res.status(500).send('Error fetching daily survey results');
+        } else {
+            res.status(200).json(dailySurvey);
+        }
+    });
+});
+
 
 app.listen(PORT, () => {
   console.log("Listening on port " + PORT);

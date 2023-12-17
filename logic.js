@@ -122,6 +122,28 @@ export default class LogicService {
             }
         });
     }
+
+    getClientWorkoutLog(clientId, callback) {
+        this.dataMod.fetchClientWorkoutLog(clientId, (err,result) =>{
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+
+    getClientDailySurvey(clientId, callback) {
+        this.dataMod.fetchClientDailySurvey(clientId, (err, result)=> {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+    
+    
     
   getWorkouts(callback) {
     this.dataMod.getWorkouts((error, exercises) => {

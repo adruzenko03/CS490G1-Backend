@@ -35,9 +35,14 @@ export default class DatabaseService {
   }
 
   getUserInfo(userId, callback) {
-    this.connection.query(
-      `SELECT * FROM users WHERE user_id='${userId}'`,
-      (err, res) => {
+    const query = `
+        SELECT u.*, cs.status as coach_status
+        FROM users u
+        LEFT JOIN coach_status cs ON u.user_id = cs.coach_id
+        WHERE u.user_id = ?
+    `;
+    //`SELECT * FROM users WHERE user_id='${userId}'`,
+    this.connection.query(query, userId, (err, res) => {
         if (err) {
           console.error("Database error:", err);
           callback(null);
@@ -165,7 +170,7 @@ export default class DatabaseService {
     });
   }
 
-  getAcceptedClients(userId, callback) {
+  getAcceptedClientsID(userId, callback) {
     const query =
       'SELECT client_id FROM coach_client_connections WHERE coach_id = ? AND status = "accepted"';
     this.connection.query(query, [userId], (err, results) => {
@@ -202,20 +207,20 @@ export default class DatabaseService {
       });
     }
     getAcceptedClients(userId, callback){
-        const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'accepted'";
-        //'SELECT u.*, s.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"'; with goal_id(int)
-        //'SELECT u.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"';   without goal_id
+      const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'accepted'";
+      //'SELECT u.*, s.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"'; with goal_id(int)
+      //'SELECT u.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"';   without goal_id
 
-        this.connection.query(query, [userId], (err, results) => {
-            if (err) {
-                // If there's a database error, pass it back to the callback
-                callback(err);
-            } else {
-                // If the query is successful, pass the results back to the callback
-                console.log(results);
-                callback(null, results);
-            }
-        });
+      this.connection.query(query, [userId], (err, results) => {
+          if (err) {
+              // If there's a database error, pass it back to the callback
+              callback(err);
+          } else {
+              // If the query is successful, pass the results back to the callback
+              console.log(results);
+              callback(null, results);
+          }
+      });
     }
     removeClient(clientId, coachId, callback) {
         const query = 'DELETE FROM coach_client_connections WHERE client_id = ? AND coach_id = ?';
@@ -285,4 +290,27 @@ export default class DatabaseService {
             }
         });
     }
+    fetchClientWorkoutLog(clientId, callback) {
+        const query = 'SELECT * FROM reps WHERE user_id = ?';
+        this.connection.query(query, [clientId], (err, results) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, results);
+            }
+        });
+    }
+
+    fetchClientDailySurvey(clientId, callback) {
+        const query = 'SELECT * FROM daily_activity WHERE user_id = ?'; 
+        this.connection.query(query, [clientId], (err, results) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, results);
+            }
+        });
+    }
+    
+    
 }

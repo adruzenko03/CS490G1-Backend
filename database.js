@@ -728,7 +728,7 @@ export default class DatabaseService {
         MAX(goal) AS goal,
         MAX(difficulty) AS difficulty,
         MAX(equipment_name) AS equipment_name,
-        MAX(muscle) AS muscle,
+        MAX(muscle_group.muscle) AS muscle,
         MAX(workout_muscle_groups.muscle_id) AS muscle_id,
         MAX(steps) AS steps,
         MAX(workouts.last_update) AS last_update
@@ -1138,25 +1138,45 @@ export default class DatabaseService {
         callback(false, err.message, null);
       } else {
         console.log("Results from database.js: ", results);
-        callback(true, 'Successful addition of exercise');
+        callback(true, results);
       }
     });
   }
 
   fetchtop5(clientId, callback) {
-    const query = `
+    /*const query = `
     SELECT * 
     FROM reps 
-    WHERE user_id = ? AND entry_date >= CURDATE() - INTERVAL 5 DAY
+    WHERE user_id = 199 AND entry_date >= CURDATE() - INTERVAL 5 DAY
     ORDER BY entry_date DESC;
+`;*/
+    /*const query = `
+    SELECT reps.*, we.workout_id, w.workout_name
+    FROM reps
+    INNER JOIN workout_exercises we ON reps.workout_exercise_id = we.workout_exercise_id
+    INNER JOIN workouts w ON we.workout_id = w.workout_id
+    WHERE reps.user_id = ? AND reps.entry_date >= CURDATE() - INTERVAL 5 DAY
+    ORDER BY reps.entry_date DESC;
+    `;*/
+    const query = `
+    SELECT reps.*, we.workout_id, w.workout_name, e.exercise_name
+    FROM reps
+    INNER JOIN workout_exercises we ON reps.workout_exercise_id = we.workout_exercise_id
+    INNER JOIN workouts w ON we.workout_id = w.workout_id
+    INNER JOIN exercises e ON we.exercise_id = e.exercise_id
+    WHERE reps.user_id = ? AND reps.entry_date >= CURDATE() - INTERVAL 5 DAY
+    ORDER BY reps.entry_date DESC;
 `;
+
+
+
     this.connection.query(query, [clientId], (err, results) => {
       if (err) {
-        console.error("Error inserting into database: ", err);
-        callback(false, err.message, null);
+        console.error("Error fetching top 5 workouts ", err);
+        callback(false, null);
       } else {
-        console.log("Results from database.js: ", results);
-        callback(true, 'Successful addition of exercise');
+        console.log("Results from database.js: in fetchtop5 ", results);
+        callback(null, results);
       }
     });
   }

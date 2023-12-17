@@ -129,11 +129,11 @@ export default class LogicService {
     }
 
     getlast5(clientId, callback) {
-      this.dataMod.fetchtop5(clientId, (err,result) =>{
+      this.dataMod.fetchtop5(clientId, (err,results) =>{
           if (err) {
               callback(err, null);
           } else {
-              callback(null, result);
+              callback(null, results);
           }
       });
   }

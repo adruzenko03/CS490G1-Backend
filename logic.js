@@ -78,51 +78,51 @@ export default class LogicService {
     });
   }
 
-    getGoals(callback){
-        this.dataMod.getGoals((res)=>{
-            callback(res)
-        })
-    }
-    removeClient(userId, callback) {
-        this.dataMod.removeClient(userId, (err, result) => {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, result);
-            }
-        });
-    }
+  getGoals(callback) {
+    this.dataMod.getGoals((res) => {
+      callback(res);
+    });
+  }
+  removeClient(userId, callback) {
+    this.dataMod.removeClient(userId, (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    });
+  }
 
-    acceptClient(userId, callback) {
-        this.dataMod.acceptClient(userId, (err, result) => {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, result);
-            }
-        });
-    }
+  acceptClient(userId, callback) {
+    this.dataMod.acceptClient(userId, (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    });
+  }
 
-    declineClient(userId, callback) {
-        this.dataMod.declineClient(userId, (err, result) => {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, result);
-            }
-        });
-    }
-    
-    getClientRequests(userId, callback){
-        this.dataMod.getRequestedClients(userId, (err, result) => {
-            if (err) {
-                callback(err, null);
-            } else {
-                callback(null, result);
-            }
-        });
-    }
-    
+  declineClient(userId, callback) {
+    this.dataMod.declineClient(userId, (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    });
+  }
+
+  getClientRequests(userId, callback) {
+    this.dataMod.getRequestedClients(userId, (err, result) => {
+      if (err) {
+        callback(err, null);
+      } else {
+        callback(null, result);
+      }
+    });
+  }
+
   getWorkouts(callback) {
     this.dataMod.getWorkouts((error, exercises) => {
       if (error) {
@@ -158,6 +158,7 @@ export default class LogicService {
       }
     );
   }
+
   insertUserWorkout(userId, workoutId, callback) {
     this.dataMod.insertUserWorkout(
       userId,
@@ -172,7 +173,7 @@ export default class LogicService {
     );
   }
 
-  getActivity(userId,callback) {
+  getActivity(userId, callback) {
     this.dataMod.getActivity(userId, (error, Activities) => {
       if (error) {
         console.error("Error retrieving Activities", error);
@@ -188,6 +189,7 @@ export default class LogicService {
     entryDate,
     calorieIntake,
     bodyWeight,
+    mood,
     callback
   ) {
     this.dataMod.insertUserDailyActivity(
@@ -195,6 +197,7 @@ export default class LogicService {
       entryDate,
       calorieIntake,
       bodyWeight,
+      mood,
       (success, message, insertId) => {
         if (success) {
           callback(true, message, insertId);

@@ -20,50 +20,32 @@ export default class LogicService {
       }
     });
   }
+
   signup(info, callback) {
     this.dataMod.checkUser(info.email, (err, res) => {
       if (err) {
-        console.log(err);
+        console.log(err, "Error Registering");
         callback(false);
       } else if (res.length == 0) {
-        this.dataMod.signupUserAuth(info.email, info.password, (err, ress) => {
-          if (err) {
-            console.log(err);
-            callback(false);
+        this.dataMod.signupUserAuth(info.email, info.password, (succ, ress) => {
+          if (!succ) {
+            console.log(ress);
+            callback(false, "Error Registering");
           } else {
-            let userID = ress[1][0].userID;
-            this.dataMod.signupUser(info, userID, (err) => {
+            let userID = ress;
+            this.dataMod.signupUser(info, userID, (err, mess) => {
               if (err) {
-                console.log(err);
+                console.log(mess);
                 this.dataMod.deleteUser(userID, () => {
-                  callback(false);
+                  callback(false, "Bad Input, Make sure all information is correct, and state is abbreviated");
                 });
               } else {
-                if (info.role == "coach") {
-                  this.dataMod.signupCoach(info, userID, (err) => {
-                    if (err) {
-                      console.log(err);
-                      this.dataMod.deleteUser(userID, () => {
-                        callback(false);
-                      });
-                    } else {
                       callback(true, { userID: userID, role: info.role });
-                    }
-                  });
-                } else {
-                  callback(true, { userID: userID, role: info.role });
                 }
-              }
-            });
-          }
+              })
+            }
         });
-      } else callback(false);
-    });
-  }
-
-  getGoals(callback) {
-    this.dataMod.getGoals((res) => {
-      callback(res);
+      } else callback(false,"User already registered");
     });
   }
 

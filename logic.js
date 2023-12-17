@@ -20,50 +20,32 @@ export default class LogicService {
       }
     });
   }
+
   signup(info, callback) {
     this.dataMod.checkUser(info.email, (err, res) => {
       if (err) {
-        console.log(err);
+        console.log(err, "Error Registering");
         callback(false);
       } else if (res.length == 0) {
-        this.dataMod.signupUserAuth(info.email, info.password, (err, ress) => {
-          if (err) {
-            console.log(err);
-            callback(false);
+        this.dataMod.signupUserAuth(info.email, info.password, (succ, ress) => {
+          if (!succ) {
+            console.log(ress);
+            callback(false, "Error Registering");
           } else {
-            let userID = ress[1][0].userID;
-            this.dataMod.signupUser(info, userID, (err) => {
+            let userID = ress;
+            this.dataMod.signupUser(info, userID, (err, mess) => {
               if (err) {
-                console.log(err);
+                console.log(mess);
                 this.dataMod.deleteUser(userID, () => {
-                  callback(false);
+                  callback(false, "Bad Input, Make sure all information is correct, and state is abbreviated");
                 });
               } else {
-                if (info.role == "coach") {
-                  this.dataMod.signupCoach(info, userID, (err) => {
-                    if (err) {
-                      console.log(err);
-                      this.dataMod.deleteUser(userID, () => {
-                        callback(false);
-                      });
-                    } else {
                       callback(true, { userID: userID, role: info.role });
-                    }
-                  });
-                } else {
-                  callback(true, { userID: userID, role: info.role });
                 }
-              }
-            });
-          }
+              })
+            }
         });
-      } else callback(false);
-    });
-  }
-
-  getGoals(callback) {
-    this.dataMod.getGoals((res) => {
-      callback(res);
+      } else callback(false,"User already registered");
     });
   }
 
@@ -77,8 +59,9 @@ export default class LogicService {
       }
     });
   }
-    removeClient(userId, callback) {
-        this.dataMod.removeClient(userId, (err, result) => {
+
+    removeClient(clientId, coachId,callback) {
+        this.dataMod.removeClient(clientId, coachId,(err, result) => {
             if (err) {
                 callback(err, null);
             } else {
@@ -87,8 +70,8 @@ export default class LogicService {
         });
     }
 
-    acceptClient(userId, callback) {
-        this.dataMod.acceptClient(userId, (err, result) => {
+    acceptClient(clientId, coachId, callback) {
+        this.dataMod.acceptClient(clientId, coachId,(err, result) => {
             if (err) {
                 callback(err, null);
             } else {
@@ -97,8 +80,8 @@ export default class LogicService {
         });
     }
 
-    declineClient(userId, callback) {
-        this.dataMod.declineClient(userId, (err, result) => {
+    declineClient(clientId, coachId, callback) {
+        this.dataMod.declineClient(clientId, coachId,(err, result) => {
             if (err) {
                 callback(err, null);
             } else {
@@ -116,6 +99,28 @@ export default class LogicService {
             }
         });
     }
+
+    getClientWorkoutLog(clientId, callback) {
+        this.dataMod.fetchClientWorkoutLog(clientId, (err,result) =>{
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+
+    getClientDailySurvey(clientId, callback) {
+        this.dataMod.fetchClientDailySurvey(clientId, (err, result)=> {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, result);
+            }
+        });
+    }
+    
+    
     
   getWorkouts(callback) {
     this.dataMod.getWorkouts((error, exercises) => {
@@ -167,7 +172,7 @@ export default class LogicService {
     );
   }
 
-  getActivity(userId,callback) {
+  getActivity(userId, callback) {
     this.dataMod.getActivity(userId, (error, Activities) => {
       if (error) {
         console.error("Error retrieving Activities", error);
@@ -183,6 +188,7 @@ export default class LogicService {
     entryDate,
     calorieIntake,
     bodyWeight,
+    mood,
     callback
   ) {
     this.dataMod.insertUserDailyActivity(
@@ -190,6 +196,7 @@ export default class LogicService {
       entryDate,
       calorieIntake,
       bodyWeight,
+      mood,
       (success, message, insertId) => {
         if (success) {
           callback(true, message, insertId);

@@ -4,7 +4,7 @@ import cors from "cors";
 import DatabaseService from "./database.js";
 
 let logMod = new LogicService();
-let dataMod= new DatabaseService()
+let dataMod = new DatabaseService();
 const app = express();
 const PORT = process.env.PORT || 3001;
 app.use(cors());
@@ -15,7 +15,7 @@ app.post("/signup", (req, res) => {
     if (status) {
       res.status(201).send(resp);
     } else {
-      res.status(406).send();
+      res.status(406).send({message:resp});
     }
   });
   // res.status(200).send({
@@ -110,41 +110,6 @@ app.get('/clientRequestsFetch/:coachId', (req, res)=>{
     })
 })
   
-
-app.delete('/removeClient/:userId', (req, res) => {
-    const { userId } = req.params;
-    logMod.removeClient(userId, (err, result) => {
-        if (err) {
-            res.status(500).send('Error removing client');
-        } else {
-            res.status(200).send('Client removed successfully');
-        }
-    });
-});
-
-app.post('/acceptClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.acceptClient(userId, (err, result) => {
-        if (err) {
-            res.status(500).send('Error accepting client');
-        } else {
-            res.status(200).send('Client accepted successfully');
-        }
-    });
-});
-
-app.post('/declineClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.declineClient(userId, (err, result) => {
-        if (err) {
-            res.status(500).send('Error declining client');
-        } else {
-            res.status(200).send('Client declined successfully');
-        }
-    });
-});
   
   app.get("/workouts", (req, res) => {
     logMod.getWorkouts((success, result) => {
@@ -206,30 +171,6 @@ app.post('/declineClient/:userId', (req, res) => {
       }
     });
   });
-
-  app.post("/activitySurvey", (req, res) => {
-    const { userId, entryDate, calorieIntake, bodyWeight } = req.body;
-  
-    logMod.insertUserDailyActivity(
-      userId,
-      entryDate,
-      calorieIntake,
-      bodyWeight,
-      (success, message, insertId) => {
-        if (success) {
-          res.status(201).json({ ok: true, message, insertId });
-        } else {
-          res.status(500).json({ ok: false, message });
-        }
-      }
-    );
-  });
-
-
-
-
-
-
 
 /* GLENS CODE ************************************ */
 
@@ -390,60 +331,12 @@ app.post('/requestCoach', (req, res) => {
   });
 });
 
-app.get("/surveyfetch/:userId", async (req, res) => {
-  const { userId } = req.params;
-  console.log("Made to Server.js", userId);
-  dataMod.getSurveyData(userId, (err, surveyData) => {
-    if (err) {
-      res.status(500).json({ ok: false, error: err.message });
-    } else {
-      res.status(200).json({ ok: true, surveyData });
-    }
-  });
-});
-
-app.get("/acceptedClients/:userId", async (req, res) => {
-  const { userId } = req.params;
-  console.log("Made to Server.js via acceptedClients", userId);
-  dataMod.getAcceptedClients(userId, (err, acceptedClients) => {
-    if (err) {
-      res.status(500).json({ ok: false, error: err.message });
-    } else {
-      res.status(200).json({ ok: true, acceptedClients });
-    }
-  });
-});
-
-app.get("/exercises", (req, res) => {
-  logMod.getExercises((success, result) => {
-    if (success) {
-      res.status(200).json({ ok: true, exercises: result });
-    } else {
-      res
-        .status(500)
-        .json({ ok: false, message: "Error retrieving exercises" });
-    }
-  });
-
-}); 
 
 
-app.get('/clientRequestsFetch/:userId', async (req, res) => {
-    const {userId} = req.params;
-    console.log("Made to Server.js via clientRequestsFetch", userId);
-    logMod.getClientRequests(userId, (err, Data) => {
-        if(err){
-            res.status(500).json({ok:false, error: err.message});
-        } else {
-            res.status(200).json({ok:true, Data});
-        }
-    });
-});
-
-//ALL CLIENTS BELOW ARE NOT DOCUMENTED
-app.delete('/removeClient/:userId', (req, res) => {
-    const { userId } = req.params;
-    logMod.removeClient(userId, (err, result) => {
+app.delete('/removeClient/:clientId/:coachId', (req, res) => {
+    const {clientId, coachId} = req.params;
+    console.log("from remove client",clientId, coachId);
+    logMod.removeClient(clientId, coachId, (err, result) => {
         if (err) {
             res.status(500).send('Error removing client');
         } else {
@@ -452,6 +345,17 @@ app.delete('/removeClient/:userId', (req, res) => {
     });
 });
 
+app.post('/acceptClient', (req, res) => {
+    const {clientId, coachId} = req.body;
+    console.log("Client id", clientId);
+    logMod.acceptClient(clientId, coachId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error accepting client');
+          } else {
+            res.status(500).json({ ok: false, message });
+          }
+          });
+      });
 // ------------------_----------------–---------------------------------------
 
 app.get('/exerciseCount/:workoutId', (req, res)=>{
@@ -495,10 +399,10 @@ app.delete('/deleteCurrentCoach/:connectionId', (req, res) => {
           }
         });
     });
-app.post('/declineClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.declineClient(userId, (err, result) => {
+app.post('/declineClient', (req, res) => {
+      const {clientId, coachId} = req.body;
+      console.log("Client id", clientId);
+      logMod.declineClient(clientId, coachId, (err, result) => {
         if (err) {
             res.status(500).send('Error declining client');
         } else {
@@ -787,64 +691,38 @@ app.get("/workouts", (req, res) => {
   });
 });
 
-app.get("/myworkouts/:userId", (req, res) => {
-  const userId = req.params.userId;
-  logMod.getUserWorkouts(userId, (success, result) => {
-    if (success) {
-      res.status(200).json({ ok: true, exercises: result });
-    } else {
-      res.status(500).json({ ok: false, message: "Error retrieving workouts" });
-    }
-  });
+app.get('/clientWorkoutLog/:clientId', (req, res) => {
+    const { clientId } = req.params;
+    logMod.getClientWorkoutLog(clientId, (err, workoutLog) => {
+        if (err) {
+            res.status(500).send('Error fetching workout log');
+        } else {
+            res.status(200).json(workoutLog);
+        }
+    });
 });
 
-
-app.delete("/workoutsremoved", (req, res) => {
-  const { userId, workoutId } = req.body;
-
-  logMod.deleteUserWorkout(userId, workoutId, (success, message, insertId) => {
-    if (success) {
-      res.status(200).json({ ok: true, message });
-    } else {
-      res.status(500).json({ ok: false, message });
-    }
-  });
+app.get('/clientDailySurvey/:clientId', (req, res) => {
+    const { clientId } = req.params;
+    logMod.getClientDailySurvey(clientId, (err, dailySurvey) => {
+        if (err) {
+            res.status(500).send('Error fetching daily survey results');
+        } else {
+            res.status(200).json(dailySurvey);
+        }
+    });
 });
 
-app.post("/workoutsadded", (req, res) => {
-  const { userId, workoutId } = req.body;
-  logMod.insertUserWorkout(userId, workoutId, (success, message, insertId) => {
-    if (success) {
-      res.status(201).json({ ok: true, message, insertId });
-    } else {
-      res.status(500).json({ ok: false, message });
-    }
-  });
-});
-
-app.get("/activities/:userId", (req, res) => {
-  const userId = req.params.userId;
-
-  logMod.getActivity(userId,(success, activities) => {
-    if (success) {
-      res.status(200).json({ ok: true, activities });
-    } else {
-      res
-        .status(500)
-        .json({ ok: false, message: "Error retrieving activities" });
-    }
-  });
-});
- 
 
 app.post("/activitySurvey", (req, res) => {
-  const { userId, entryDate, calorieIntake, bodyWeight } = req.body;
+  const { userId, entryDate, calorieIntake, bodyWeight, mood } = req.body;
 
   logMod.insertUserDailyActivity(
     userId,
     entryDate,
     calorieIntake,
     bodyWeight,
+    mood,
     (success, message, insertId) => {
       if (success) {
         res.status(201).json({ ok: true, message, insertId });

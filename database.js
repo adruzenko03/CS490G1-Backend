@@ -5,12 +5,11 @@ export default class DatabaseService {
     constructor() {
       this.connection = mysql.createConnection(
         {
-          multipleStatements: true,
-          host: process.env.DB_HOST,
-          user: process.env.DB_USER,
-          password: process.env.PASS,
-          database: process.env.DB_DB,
-          port:process.env.DB_PORT
+            multipleStatements: true,
+            host: "localhost",
+            user: "root",
+            password: 'Nike2001.',
+            database: "fitness",
         }
       );
       
@@ -40,18 +39,23 @@ export default class DatabaseService {
     }
   
     getUserInfo(userId, callback) {
-      this.connection.query(
-        `SELECT * FROM users WHERE user_id='${userId}'`,
-        (err, res) => {
-          if (err) {
-            console.error("Database error:", err);
-            callback(null);
-            return;
-          }
-          const userInfo = res[0];
-          console.log("Database response!:", userInfo);
-          callback(userInfo);
+      const query = `
+            SELECT u.*, cs.status as coach_status
+            FROM users u
+            LEFT JOIN coach_status cs ON u.user_id = cs.coach_id
+            WHERE u.user_id = ?
+        `;
+      //`SELECT * FROM users WHERE user_id='${userId}'`,
+      this.connection.query(query, userId, (err, res) => {
+        if (err) {
+          console.error("Database error:", err);
+          callback(null);
+          return;
         }
+        const userInfo = res[0];
+        console.log("Database response!:", userInfo);
+        callback(userInfo);
+      }
       );
     }
   
@@ -600,7 +604,7 @@ export default class DatabaseService {
         MAX(goal) AS goal,
         MAX(difficulty) AS difficulty,
         MAX(equipment_name) AS equipment_name,
-        MAX(muscle) AS muscle,
+        MAX(muscle_groups.muscle) AS muscle,
         MAX(workout_muscle_groups.muscle_id) AS muscle_id,
         MAX(steps) AS steps,
         MAX(workouts.last_update) AS last_update
@@ -623,7 +627,7 @@ export default class DatabaseService {
         LEFT JOIN 
             equipment ON equipment.equipment_id = exercise_equipment.equipment_id
         LEFT JOIN 
-            reps ON exercises.exercise_id = reps.exercise_id
+            reps ON exercises.exercise_id = reps.workout_exercise_id
         WHERE 
             user_workouts.user_id = ?
         GROUP BY 
@@ -655,7 +659,7 @@ export default class DatabaseService {
                 console.error("Error inserting into database: ", error);
                 callback(error, null);
             } else {
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(null, results);
             }
         });
@@ -687,7 +691,7 @@ export default class DatabaseService {
                 console.error("Error deleting from database: ", err);
                 callback(false, err.message, null);
             }else{
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Delete was successful');
             }
         })
@@ -704,12 +708,12 @@ export default class DatabaseService {
                         `
 
         this.connection.query(query, [connectionId], (err, results)=>{
-            console.log(connectionId);
+            // console.log(connectionId);
             if(err){
                 console.error("Error updating database: ", err);
                 callback(false, err.message, null);
             }else{
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Request acceptance was successful.');
             }
         })
@@ -724,7 +728,7 @@ export default class DatabaseService {
                 if (err1) {
                     callback(err1);
                 } else {
-                    console.log("Deletion was successful");
+                    // console.log("Deletion was successful");
                     // callback(true, 'Delete was successful');
                 }
             }
@@ -744,7 +748,7 @@ export default class DatabaseService {
             if(err){
                 callback(err);
             }else{
-                console.log(results);
+                // console.log(results);
                 callback(null, results);
             }
         })
@@ -765,7 +769,7 @@ export default class DatabaseService {
             if(err){
                 callback(err);
             }else{
-                console.log(results);
+                // console.log(results);
                 callback(null, results);
             }
         })
@@ -779,12 +783,12 @@ export default class DatabaseService {
                         WHERE coach_client_id = ?;`
 
         this.connection.query(query, [connectionId], (err, results)=>{
-            console.log(connectionId);
+            // console.log(connectionId);
             if(err){
                 console.error("Error updating database: ", err);
                 callback(false, err.message, null);
             }else{
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Request acceptance was successful.');
             }
         })
@@ -801,7 +805,7 @@ export default class DatabaseService {
                 console.error("Error deleting from database: ", err);
                 callback(false, err.message, null);
             }else{
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Delete was successful');
             }
         })
@@ -824,7 +828,7 @@ export default class DatabaseService {
                 console.error("Error updating workout details: ", err1);
                 callback(false, err1.message, null);
             } else {
-                console.log("Workout details updated: ", results1);
+                // console.log("Workout details updated: ", results1);
                 const new_muscle_id = data.editedItems.muscle_id;
                 const old_muscle_id = data.oldMuscleId;
                 // Second query for updating workout_muscle_groups
@@ -837,7 +841,7 @@ export default class DatabaseService {
                         console.error("Error updating muscle groups: ", err2);
                         callback(false, err2.message, null);
                     } else {
-                        console.log("Muscle groups updated: ", results2);
+                        // console.log("Muscle groups updated: ", results2);
                         callback(true, 'Request acceptance was successful.');
                     }
                 });
@@ -862,7 +866,7 @@ export default class DatabaseService {
                 console.error("Error inserting into database: ", err);
                 callback(false, err.message, null);
             } else {
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Successful addition of exercise');
             }
         });
@@ -916,7 +920,7 @@ export default class DatabaseService {
                 console.error("Error updating database: ", err);
                 callback(false, err.message, null);
             }else{
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Request acceptance was successful.');
             }
         })
@@ -933,7 +937,7 @@ export default class DatabaseService {
                 console.error("Error deleting from database: ", err);
                 callback(false, err.message, null);
             }else{
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Delete was successful');
             }
         })
@@ -950,7 +954,7 @@ export default class DatabaseService {
                 console.error("Error inserting into database: ", err);
                 callback(false, err.message);
             } else {
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Successful addition of exercise');
             }
         });
@@ -971,7 +975,7 @@ export default class DatabaseService {
                 console.error("Error deleting from database: ", err);
                 callback(false, err.message, null);
             }else{
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Delete was successful');
             }
         })
@@ -1067,7 +1071,7 @@ export default class DatabaseService {
                 console.error("Error inserting into database: ", err);
                 callback(false, err.message, null);
             } else {
-                console.log("Results from database.js: ", results);
+                // console.log("Results from database.js: ", results);
                 callback(true, 'Successful addition of exercise');
             }
         });

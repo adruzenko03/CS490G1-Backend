@@ -549,12 +549,11 @@ export default class LogicService {
   }
 
   sendNewMessage(data, callback){
-    this.dataMod.sendNewMessage(data, (error, surveyData)=>{
-      if(error){
-        console.log("Error sending chat data: ", error);
-        callback(false, {message:"Error sending chat data"});
+    this.dataMod.sendNewMessage(data, (success,message, surveyData)=>{
+      if(success){
+        callback(false, message, surveyData);
       }else{
-        callback(true, surveyData)
+        callback(true, { message: "Error sending message" });
       }
     })
   }

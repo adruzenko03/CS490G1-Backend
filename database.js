@@ -149,11 +149,25 @@ export default class DatabaseService {
       if (err) {
         callback(false, err.message);
       } else {
-        // If the insert is successful, send back a success message.
-        callback(true, "Survey data inserted successfully", surveyData);
+        
+        const query = `INSERT INTO coach_status (coach_id, status) VALUES (?, 'pending')`; //change to accept last param too
+        const values = [
+          surveyData.userID,
+         ];
+    
+        this.connection.query(query, values, (err, results) => {
+          if (err) {
+            console.log
+            callback(false, err.message);
+          } else {
+            // If the insert is successful, send back a success message.
+            callback(true, "Survey data inserted successfully", surveyData);
+          }
+        });
       }
     });
   }
+
   insertClientSurvey(surveyData, callback) {
     const query = `INSERT INTO survey (user_id, fitness_level, diet, weekly_exercise, goal_id) VALUES (?, ?, ?, ?, ?)`; //change to accept last param too
     console.log("What will be inserted into survey table ", surveyData);

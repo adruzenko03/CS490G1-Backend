@@ -286,7 +286,7 @@ export default class DatabaseService {
 
 
 
-      /******************************* GLENS CODE  */
+      /******************************* GLENS CODE */
 
 
 //  -------------------------------------------------------------------------
@@ -510,10 +510,10 @@ export default class DatabaseService {
         this.connection.query(query, values,  (error, results) => {
             if (error) {
                 console.error("Error inserting into database: ", error);
-                callback(false, error.message, null);
+                callback(error, null);
             } else {
                 console.log("Results from database.js: ", results);
-                callback(true, 'Signup Coach successful');
+                callback(null, results);
             }
         });
     }
@@ -556,7 +556,9 @@ export default class DatabaseService {
     acceptClientRequest(connectionId, callback){
         const query = `UPDATE fitness.coach_client_connections
                         SET status = 'accepted' 
-                        WHERE coach_client_id = ?;`
+                        WHERE coach_client_id = ?;
+
+                        `
 
         this.connection.query(query, [connectionId], (err, results)=>{
             console.log(connectionId);

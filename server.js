@@ -4,7 +4,7 @@ import cors from "cors";
 import DatabaseService from "./database.js";
 
 let logMod = new LogicService();
-let dataMod= new DatabaseService()
+let dataMod = new DatabaseService();
 const app = express();
 const PORT = process.env.PORT || 3001;
 app.use(cors());
@@ -440,10 +440,10 @@ app.get('/clientRequestsFetch/:userId', async (req, res) => {
     });
 });
 
-//ALL CLIENTS BELOW ARE NOT DOCUMENTED
-app.delete('/removeClient/:userId', (req, res) => {
-    const { userId } = req.params;
-    logMod.removeClient(userId, (err, result) => {
+app.delete('/removeClient/:clientId/:coachId', (req, res) => {
+    const {clientId, coachId} = req.params;
+    console.log("from remove client",clientId, coachId);
+    logMod.removeClient(clientId, coachId, (err, result) => {
         if (err) {
             res.status(500).send('Error removing client');
         } else {
@@ -452,6 +452,17 @@ app.delete('/removeClient/:userId', (req, res) => {
     });
 });
 
+app.post('/acceptClient', (req, res) => {
+    const {clientId, coachId} = req.body;
+    console.log("Client id", clientId);
+    logMod.acceptClient(clientId, coachId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error accepting client');
+          } else {
+            res.status(500).json({ ok: false, message });
+          }
+          });
+      });
 // ------------------_----------------–---------------------------------------
 
 app.get('/exerciseCount/:workoutId', (req, res)=>{
@@ -495,10 +506,10 @@ app.delete('/deleteCurrentCoach/:connectionId', (req, res) => {
           }
         });
     });
-app.post('/declineClient/:userId', (req, res) => {
-    const {userId} = req.params;
-    console.log("Client id", userId);
-    logMod.declineClient(userId, (err, result) => {
+app.post('/declineClient', (req, res) => {
+      const {clientId, coachId} = req.body;
+      console.log("Client id", clientId);
+      logMod.declineClient(clientId, coachId, (err, result) => {
         if (err) {
             res.status(500).send('Error declining client');
         } else {
@@ -785,6 +796,28 @@ app.get("/workouts", (req, res) => {
         .json({ ok: false, message: "Error retrieving workouts" });
     }
   });
+});
+
+app.get('/clientWorkoutLog/:clientId', (req, res) => {
+    const { clientId } = req.params;
+    logMod.getClientWorkoutLog(clientId, (err, workoutLog) => {
+        if (err) {
+            res.status(500).send('Error fetching workout log');
+        } else {
+            res.status(200).json(workoutLog);
+        }
+    });
+});
+
+app.get('/clientDailySurvey/:clientId', (req, res) => {
+    const { clientId } = req.params;
+    logMod.getClientDailySurvey(clientId, (err, dailySurvey) => {
+        if (err) {
+            res.status(500).send('Error fetching daily survey results');
+        } else {
+            res.status(200).json(dailySurvey);
+        }
+    });
 });
 
 app.get("/myworkouts/:userId", (req, res) => {

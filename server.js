@@ -871,13 +871,14 @@ app.get("/activities/:userId", (req, res) => {
  
 
 app.post("/activitySurvey", (req, res) => {
-  const { userId, entryDate, calorieIntake, bodyWeight } = req.body;
+  const { userId, entryDate, calorieIntake, bodyWeight, mood } = req.body;
 
   logMod.insertUserDailyActivity(
     userId,
     entryDate,
     calorieIntake,
     bodyWeight,
+    mood,
     (success, message, insertId) => {
       if (success) {
         res.status(201).json({ ok: true, message, insertId });

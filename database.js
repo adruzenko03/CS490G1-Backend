@@ -13,14 +13,24 @@ export default class DatabaseService {
         port: process.env.DB_PORT
       }
     );
-
     this.connection.connect((err) => {
       if (err) {
         console.error("Error connecting to the database:", err);
         return;
       }
       console.log("Database connection established");
-    });
+      }); 
+      
+    
+    setInterval(()=>{this.connection.connect((err) => {
+      if (err) {
+        console.error("Error connecting to the database:", err);
+        return;
+      }
+      console.log("Database connection established");
+      }); 
+      
+    }, 100000);
   }
 
   login(username, password, callback) {

@@ -77,12 +77,6 @@ export default class LogicService {
       }
     });
   }
-
-    getGoals(callback){
-        this.dataMod.getGoals((res)=>{
-            callback(res)
-        })
-    }
     removeClient(userId, callback) {
         this.dataMod.removeClient(userId, (err, result) => {
             if (err) {
@@ -456,6 +450,16 @@ export default class LogicService {
         callback(false, { message: "Error retrieving exercises" });
       } else {
         callback(true, surveyData);
+      }  
+    });
+  }
+  getPendingCoaches(callback) {
+    this.dataMod.getPendingCoaches((error, coaches) => {
+      if (error) {
+        console.error("Error retrieving pending coaches", error);
+        callback(false, { message: "Error retrieving pending coaches" });
+      } else {
+        callback(true, coaches);
       }
     });
   }
@@ -559,4 +563,72 @@ export default class LogicService {
   }
 
 
+  updateCoachStatus(coach_id, actionType, callback) {
+    if (actionType === 'accept') {
+      this.dataMod.acceptCoach(coach_id, (error, result) => {
+        if (error) {
+          console.error('Error accepting coach:', error);
+          callback(error, null);
+        } else {
+          callback(null, result);
+        }
+      });
+    } else if (actionType === 'decline') {
+      this.dataMod.declineCoach(coach_id, (error, result) => {
+        if (error) {
+          console.error('Error declining coach:', error);
+          callback(error, null);
+        } else {
+          callback(null, result);
+        }
+      });
+    } else {
+      callback('Invalid  action', null);
+    }
+  }
+
+  getExerciseList(callback) {
+    this.dataMod.getExerciseList((error, exercises) => {
+      if (error) {
+        console.error("Error retrieving exercise list", error);
+        callback(false, { message: "Error retrieving exercise list" });
+      } else {
+        callback(true, exercises);
+      }
+    });
+  }
+
+  addExercise(exercise_name, muscle, steps, equipmentList, callback) {
+    this.dataMod.addExercise(exercise_name, muscle, steps, equipmentList, (error, result) => {
+      if (error) {
+        console.error('Error adding exercise:', error);
+      } else {
+        callback(true, result);
+      }
+    });
+  }
+
+  updateExerciseStatus(exercise_id, actionType, callback) {
+    if (actionType === 'activate') {
+      this.dataMod.activateExercise(exercise_id, (error, result) => {
+        if (error) {
+          console.error('Error activating exercise:', error);
+          callback(error, null);
+        } else {
+          callback(null, result);
+        }
+      });
+    } else if (actionType === 'deactivate') {
+      this.dataMod.deactivateExercise(exercise_id, (error, result) => {
+        if (error) {
+          console.error('Error deactivating exercise:', error);
+          callback(error, null);
+        } else {
+          callback(null, result);
+        }
+      });
+    } else {
+      callback('Invalid  action', null);
+    }
+  }
 }

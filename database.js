@@ -197,9 +197,9 @@ export default class DatabaseService {
       if (error) {
         return callback(error);
       }
-      const userInfo = res[0];
+      const userInfo = results;
       console.log("Database response!:", userInfo);
-      callback(userInfo);
+      callback(false,userInfo);
     }
     );
   }
@@ -472,29 +472,6 @@ export default class DatabaseService {
     });
   }
 
-  acceptClient(userId, callback) {
-    const query =
-      'UPDATE coach_client_connections SET status = "accepted" WHERE client_id = ?';
-    this.connection.query(query, [userId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        callback(null, result);
-      }
-    });
-  }
-
-  declineClient(userId, callback) {
-    const query =
-      'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ?';
-    this.connection.query(query, [userId], (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        callback(null, result);
-      }
-    });
-  }
 
   getPendingCoaches(callback) {
     const query =
@@ -507,22 +484,7 @@ export default class DatabaseService {
       callback(null, results);
     });
   }
-  getAcceptedClients(userId, callback) {
-    const query = "SELECT u.*, s.*, g.goal as goal_description FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id LEFT JOIN goals g ON s.goal_id = g.goal_id WHERE ccc.coach_id = ? AND ccc.status = 'accepted'";
-    //'SELECT u.*, s.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id LEFT JOIN survey s ON u.user_id = s.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"'; with goal_id(int)
-    //'SELECT u.* FROM coach_client_connections ccc JOIN users u ON ccc.client_id = u.user_id WHERE ccc.coach_id = ? AND ccc.status = "accepted"';   without goal_id
 
-    this.connection.query(query, [userId], (err, results) => {
-      if (err) {
-        // If there's a database error, pass it back to the callback
-        callback(err);
-      } else {
-        // If the query is successful, pass the results back to the callback
-        console.log(results);
-        callback(null, results);
-      }
-    });
-  }
 
   acceptCoach(coach_id, callback) {
     const query = 'UPDATE coach_status SET status = "accepted" WHERE coach_id = ?';

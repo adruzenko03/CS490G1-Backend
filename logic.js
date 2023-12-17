@@ -190,7 +190,7 @@ export default class LogicService {
     );
   }
 
-  getActivity(userId,callback) {
+  getActivity(userId, callback) {
     this.dataMod.getActivity(userId, (error, Activities) => {
       if (error) {
         console.error("Error retrieving Activities", error);
@@ -206,6 +206,7 @@ export default class LogicService {
     entryDate,
     calorieIntake,
     bodyWeight,
+    mood,
     callback
   ) {
     this.dataMod.insertUserDailyActivity(
@@ -213,6 +214,7 @@ export default class LogicService {
       entryDate,
       calorieIntake,
       bodyWeight,
+      mood,
       (success, message, insertId) => {
         if (success) {
           callback(true, message, insertId);

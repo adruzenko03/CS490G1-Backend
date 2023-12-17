@@ -15,7 +15,7 @@ app.post("/signup", (req, res) => {
     if (status) {
       res.status(201).send(resp);
     } else {
-      res.status(406).send();
+      res.status(406).send({message:resp});
     }
   });
   // res.status(200).send({

@@ -72,72 +72,68 @@ export default class DatabaseService {
 
   checkUser(email, callback) {
     this.connection.query(
-      `SELECT * FROM users WHERE email='${email}'`,
+      `SELECT * FROM user_auth WHERE email='${email}'`,
       (err, res) => {
-        callback(res);
-      }
-    );
+        if(err)
+          callback(true)
+        else
+          callback(false,res);
+      });
   }
-  signupCoach(info, callback) {
-    console.log("signupCoach() ", info);
-    const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [
-      info.firstName,
-      info.lastName,
-      info.email,
-      info.password,
-      info.phoneNumber,
-      info.streetAddress,
-      info.city,
-      info.state,
-      info.zipCode,
-      info.role,
-    ];
-    this.connection.query(query, values, (err, results) => {
-      if (err) {
-        callback(false, err.message, null);
-      } else {
-        console.log("Results from database.js, ", results);
-        callback(true, "Signup Coach successful", results.insertId);
-      }
-    });
-  }
-  signupClient(info, callback) {
-    console.log("signupClient()", info);
-    const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [
-      info.firstName,
-      info.lastName,
-      info.email,
-      info.password,
-      info.phoneNumber,
-      info.streetAddress,
-      info.city,
-      info.state,
-      info.zipCode,
-      info.role,
-    ];
 
+  signupUserAuth(email, pass, callback){
+    const query = `INSERT INTO user_auth (email, password) VALUES (?,?)`;
+    const values = [
+      email,
+      pass,
+    ];
     this.connection.query(query, values, (err, results) => {
       if (err) {
         callback(false, err.message);
       } else {
         console.log("Results from database.js, ", results);
-        callback(true, "Signup Client successful", results.insertId);
+        callback(true, results.insertId);
       }
     });
   }
+  
+  signupUser(info, userID, callback) {
+    console.log("signupUser() ", info);
+    const query = `INSERT INTO users (user_id, first_name, last_name, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    const values = [
+      userID,
+      info.firstName,
+      info.lastName,
+      info.phoneNumber,
+      info.streetAddress,
+      info.city,
+      info.state,
+      info.zipCode,
+      info.role,
+    ];
+    this.connection.query(query, values, (err, results) => {
+      if (err) {
+        callback(true, err.message);
+      } else {
+        console.log("Results from database.js, ", results);
+        callback(false, "Signup Coach successful", results.insertId);
+      }
+    });
+  }
+  deleteUser(user_id, callback) {
+    this.connection.query(`DELETE FROM user_auth WHERE user_id=${user_id}`, (err, res) => {
+        callback(err, res)
+    })
+}
 
   insertCoachSurvey(surveyData, callback) {
-    const query = `INSERT INTO coach_survey (user_id, experience, city, state, cost, goals) VALUES (?, ?, ?, ?, ?, ?)`; //change to accept last param too
+    const query = `INSERT INTO coach_survey (user_id, experience, cost, goal) VALUES (?, ?, ?, ?)`; //change to accept last param too
     console.log("What will be inserted into coach_survey table ", surveyData);
     const values = [
       surveyData.userID,
       surveyData.experience,
-      surveyData.city,
-      surveyData.state,
       surveyData.cost,
-      JSON.stringify(surveyData.goals),
+      surveyData.goal,
     ];
 
     this.connection.query(query, values, (err, results) => {
@@ -212,125 +208,6 @@ export default class DatabaseService {
       callback(false,userInfo);
     }
     );
-  }
-
-  checkUser(email, callback) {
-    this.connection.query(
-      `SELECT * FROM users WHERE email='${email}'`,
-      (err, res) => {
-        callback(res);
-      }
-    );
-  }
-  signupCoach(info, callback) {
-    console.log("signupCoach() ", info);
-    const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [
-      info.firstName,
-      info.lastName,
-      info.email,
-      info.password,
-      info.phoneNumber,
-      info.streetAddress,
-      info.city,
-      info.state,
-      info.zipCode,
-      info.role,
-    ];
-
-    this.connection.query(query, values, (err, results) => {
-      if (err) {
-        callback(false, err.message, null);
-      } else {
-        console.log("Results from database.js, ", results);
-        callback(true, "Signup Coach successful", results.insertId);
-      }
-    });
-  }
-  signupClient(info, callback) {
-    console.log("signupClient()", info);
-    const query = `INSERT INTO users (first_name, last_name, email, password, phone_number, street_address, city, state, zip, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const values = [
-      info.firstName,
-      info.lastName,
-      info.email,
-      info.password,
-      info.phoneNumber,
-      info.streetAddress,
-      info.city,
-      info.state,
-      info.zipCode,
-      info.role,
-    ];
-
-    this.connection.query(query, values, (err, results) => {
-      if (err) {
-        callback(false, err.message);
-      } else {
-        console.log("Results from database.js, ", results);
-        callback(true, "Signup Client successful", results.insertId);
-      }
-    });
-  }
-
-  insertCoachSurvey(surveyData, callback) {
-    const query = `INSERT INTO coach_survey (user_id, experience, city, state, cost, goals) VALUES (?, ?, ?, ?, ?, ?)`; //change to accept last param too
-    console.log("What will be inserted into coach_survey table ", surveyData);
-    const values = [
-      surveyData.userID,
-      surveyData.experience,
-      surveyData.city,
-      surveyData.state,
-      surveyData.cost,
-      JSON.stringify(surveyData.goals),
-    ];
-
-    this.connection.query(query, values, (err, results) => {
-      if (err) {
-        callback(false, err.message);
-      } else {
-        // If the insert is successful, send back a success message.
-        callback(true, "Survey data inserted successfully", surveyData);
-      }
-    });
-  }
-  insertClientSurvey(surveyData, callback) {
-    const query = `INSERT INTO survey (user_id, fitness_level, diet, weekly_exercise, goal_id) VALUES (?, ?, ?, ?, ?)`; //change to accept last param too
-    console.log("What will be inserted into survey table ", surveyData);
-    const values = [
-      surveyData.userID,
-      surveyData.currentFitnessLevel,
-      surveyData.currentDiet,
-      surveyData.currentExerciseSchedule,
-      surveyData.fitnessGoal,
-    ];
-
-    this.connection.query(query, values, (err, results) => {
-      if (err) {
-        callback(false, err.message);
-      } else {
-        // If the insert is successful, send back a success message.
-        callback(true, "Survey data inserted successfully", surveyData);
-      }
-    });
-  }
-
-  getSurveyData(userId, callback) {
-    const query = `
-    SELECT s.*, g.goal 
-    FROM survey s
-    LEFT JOIN goals g ON s.goal_id = g.goal_id
-    WHERE s.user_id = ?
-    `;
-    //const query = "SELECT * FROM survey WHERE user_id = ?";
-    this.connection.query(query, [userId], (err, results) => {
-      if (err) {
-        callback(err);
-      } else {
-        console.log(results);
-        callback(null, results);
-      }
-    });
   }
 
   getAcceptedClientsID(userId, callback) {

@@ -1143,6 +1143,24 @@ export default class DatabaseService {
     });
   }
 
+  fetchtop5(clientId, callback) {
+    const query = `
+    SELECT * 
+    FROM reps 
+    WHERE user_id = ? AND entry_date >= CURDATE() - INTERVAL 5 DAY
+    ORDER BY entry_date DESC;
+`;
+    this.connection.query(query, [clientId], (err, results) => {
+      if (err) {
+        console.error("Error inserting into database: ", err);
+        callback(false, err.message, null);
+      } else {
+        console.log("Results from database.js: ", results);
+        callback(true, 'Successful addition of exercise');
+      }
+    });
+  }
+
   // -----------------------------------–---------------------------------------
 
 

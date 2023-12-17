@@ -128,6 +128,16 @@ export default class LogicService {
         });
     }
 
+    getlast5(clientId, callback) {
+      this.dataMod.fetchtop5(clientId, (err,result) =>{
+          if (err) {
+              callback(err, null);
+          } else {
+              callback(null, result);
+          }
+      });
+  }
+
     getClientDailySurvey(clientId, callback) {
         this.dataMod.fetchClientDailySurvey(clientId, (err, result)=> {
             if (err) {
@@ -305,9 +315,9 @@ export default class LogicService {
   }
 
 
-  getClientInfo(clientId, callback){
+   getClientInfo(clientId, callback){
     this.dataMod.getClientInfo(clientId, (error, surveyData)=>{
-      if(error){
+      if(error){ 
         console.log("Error retrieving client info : ", error);
         callback(false, {message:"Error retrieving coach list"});
       }else{

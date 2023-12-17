@@ -322,11 +322,11 @@ app.get('/clientWorkouts/:clientId', (req, res)=>{
 
 app.post('/requestCoach', (req, res) => {
     const {clientId, items} = req.body;
-    logMod.requestCoach(clientId, items, (success, result) => {
-        if(success){
-            res.status(200).json({ok:true, surveyData: result});
+    logMod.requestCoach(clientId, items, (err, result) => {
+        if(err){
+            res.status(500).send('Error requesting coach');
         }else{
-            res.status(500).json({ok:false, message: "Error requesting coach."});
+            res.status(200).json({ok:true, surveyData: result});
     }
   });
 });
@@ -476,11 +476,11 @@ app.delete('/deleteClient/:connectionId', async (req, res) => {
 app.put('/sendWorkoutData/:workoutId', async(req, res)=>{
     const workoutId = req.params.workoutId;
     const data = req.body;
-    logMod.sendWorkoutData(workoutId, data, (success, message)=>{
+    logMod.sendWorkoutData(workoutId, data, (success, responseData)=>{
         if(success){
-            res.status(200).json({ ok: true, message: 'Workout data successfully sent.' });
+            res.status(200).json({ ok: true, message: 'Workout data successfully sent.', data: responseData });
         }else{
-            res.status(400).json({ ok: false, message });
+            res.status(400).json({ ok: false, message: 'Error sending workout data.', data: responseData });
         }
     })
 })

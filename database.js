@@ -851,40 +851,36 @@ export default class DatabaseService {
   sendWorkoutData(workoutId, data, callback) {
 
     const query1 = `UPDATE fitness.workouts 
-                        SET workout_name = ?, goal_id = ?, difficulty = ? 
-                        WHERE workout_id = ?`;
+                    SET workout_name = ?, goal_id = ?, difficulty = ? 
+                    WHERE workout_id = ?`;
+    
+    const { workout_name, difficulty, goal_id} = data.editedItems;
 
-        
-        const { workout_name, difficulty, goal_id} = data.editedItems;
-
-        this.connection.query(query1, [workout_name, goal_id, difficulty, workoutId], (err1, results1) => {
-            if (err1) {
-                console.error("Error updating workout details: ", err1);
-                callback(false, err1.message, null);
-            } else {
-                // console.log("Workout details updated: ", results1);
-                const new_muscle_id = data.editedItems.muscle_id;
-                const old_muscle_id = data.oldMuscleId;
-                // Second query for updating workout_muscle_groups
-                const query2 = `UPDATE fitness.workout_muscle_groups 
-                                SET muscle_id = ?
-                                WHERE workout_id = ? AND muscle_id = ?`;
-                
-                this.connection.query(query2, [new_muscle_id, workoutId, old_muscle_id], (err2, results2) => {
-                    if (err2) {
-                        console.error("Error updating muscle groups: ", err2);
-                        callback(false, err2.message, null);
-                    } else {
-                        // console.log("Muscle groups updated: ", results2);
-                        callback(true, 'Request acceptance was successful.');
-                    }
-                });
-            }
-
-        });
-      }
+    this.connection.query(query1, [workout_name, goal_id, difficulty, workoutId], (err1, results1) => {
+        if (err1) {
+            console.error("Error updating workout details: ", err1);
+            callback(false, err1.message, null);
+        } else {
+            // console.log("Workout details updated: ", results1);
+            const new_muscle_id = data.editedItems.muscle_id;
+            const old_muscle_id = data.oldMuscleId;
+            // Second query for updating workout_muscle_groups
+            const query2 = `UPDATE fitness.workout_muscle_groups 
+                            SET muscle_id = ?
+                            WHERE workout_id = ? AND muscle_id = ?`;
+            
+            this.connection.query(query2, [new_muscle_id, workoutId, old_muscle_id], (err2, results2) => {
+                if (err2) {
+                    console.error("Error updating muscle groups: ", err2);
+                    callback(false, err2.message, null);
+                } else {
+                    // console.log("Muscle groups updated: ", results2);
+                    callback(true, 'Request acceptance was successful.');
+                }
+            });
+        }
     });
-  }
+}
 
   // ------------------_----------------–---------------------------------------
 
@@ -982,42 +978,42 @@ export default class DatabaseService {
     }
 
 
-    this.connection.beginTransaction(err => {
-      if (err) {
-        callback(err);
-        return;
-      }
+  //   this.connection.beginTransaction(err => {
+  //     if (err) {
+  //       callback(err);
+  //       return;
+  //     }
 
-      this.connection.query(query, [clientId, coachId], (err, acceptresult) => {
-        if (err) {
-          return this.connection.rollback(() => {
-            callback(err);
-          });
-        }
+  //     this.connection.query(query, [clientId, coachId], (err, acceptresult) => {
+  //       if (err) {
+  //         return this.connection.rollback(() => {
+  //           callback(err);
+  //         });
+  //       }
 
-        this.connection.query(declineothers, [clientId, coachId], (err, declineresult) => {
-          if (err) {
-            return this.connection.rollback(() => {
-              callback(err);
-            });
-          }
+  //       this.connection.query(declineothers, [clientId, coachId], (err, declineresult) => {
+  //         if (err) {
+  //           return this.connection.rollback(() => {
+  //             callback(err);
+  //           });
+  //         }
 
-          this.connection.commit(err => {
-            if (err) {
+  //         this.connection.commit(err => {
+  //           if (err) {
 
-                console.error("Error inserting into database: ", err);
-                callback(false, err.message);
-            } else {
-                // console.log("Results from database.js: ", results);
-                callback(true, 'Successful addition of exercise');
+  //               console.error("Error inserting into database: ", err);
+  //               callback(false, err.message);
+  //           } else {
+  //               // console.log("Results from database.js: ", results);
+  //               callback(true, 'Successful addition of exercise');
 
-            }
-            callback(null, { acceptresult, declineresult });
-          });
-        });
-      });
-    });
-  }
+  //           }
+  //           callback(null, { acceptresult, declineresult });
+  //         });
+  //       });
+  //     });
+  //   });
+  // }
 
   declineClient(clientId, coachId, callback) {
     const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ? AND coach_id = ?';

@@ -7,10 +7,10 @@ export default class LogicService {
 
   login(username, password, callback) {
     this.dataMod.login(username, password, (res) => {
-      if (res.length == 0)
+      if (res &&  res.length == 0)
         callback(false, { message: "Incorrect username or password" });
       else {
-        this.dataMod.getUserInfo(res.user_id, (userInfo) => {
+        this.dataMod.getUserInfo(res && res.user_id, (userInfo) => {
           if (userInfo) {
             callback(true, { user: { ...res, ...userInfo } });
           } else {

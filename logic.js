@@ -20,50 +20,32 @@ export default class LogicService {
       }
     });
   }
+
   signup(info, callback) {
     this.dataMod.checkUser(info.email, (err, res) => {
       if (err) {
-        console.log(err);
+        console.log(err, "Error Registering");
         callback(false);
       } else if (res.length == 0) {
-        this.dataMod.signupUserAuth(info.email, info.password, (err, ress) => {
-          if (err) {
-            console.log(err);
-            callback(false);
+        this.dataMod.signupUserAuth(info.email, info.password, (succ, ress) => {
+          if (!succ) {
+            console.log(ress);
+            callback(false, "Error Registering");
           } else {
-            let userID = ress[1][0].userID;
-            this.dataMod.signupUser(info, userID, (err) => {
+            let userID = ress;
+            this.dataMod.signupUser(info, userID, (err, mess) => {
               if (err) {
-                console.log(err);
+                console.log(mess);
                 this.dataMod.deleteUser(userID, () => {
-                  callback(false);
+                  callback(false, "Bad Input, Make sure all information is correct, and state is abbreviated");
                 });
               } else {
-                if (info.role == "coach") {
-                  this.dataMod.signupCoach(info, userID, (err) => {
-                    if (err) {
-                      console.log(err);
-                      this.dataMod.deleteUser(userID, () => {
-                        callback(false);
-                      });
-                    } else {
                       callback(true, { userID: userID, role: info.role });
-                    }
-                  });
-                } else {
-                  callback(true, { userID: userID, role: info.role });
                 }
-              }
-            });
-          }
+              })
+            }
         });
-      } else callback(false);
-    });
-  }
-
-  getGoals(callback) {
-    this.dataMod.getGoals((res) => {
-      callback(res);
+      } else callback(false,"User already registered");
     });
   }
 
@@ -349,12 +331,11 @@ export default class LogicService {
   }
 
   requestCoach(clientId, items, callback){
-    this.dataMod.requestCoach(clientId, items, (error, surveyData)=>{
-      if(error){
-        console.log("Error sending request to coach : ", error);
-        callback(false, {message:"Error sending request to coach"});
-      }else{
-        callback(true, surveyData)
+    this.dataMod.requestCoach(clientId, items, (err, surveyData)=>{
+      if (err) {
+        callback(err, null);
+      } else {
+          callback(null, surveyData);
       }
     })
   }
@@ -444,23 +425,21 @@ export default class LogicService {
   }
 
   sendWorkoutData(workoutId, data, callback){
-    this.dataMod.sendWorkoutData(workoutId, data, (error, surveyData)=>{
-      if(error){
-        console.log("Error sending workout data: ", error);
-        callback(false, {message:"Error sending workout data"});
+    this.dataMod.sendWorkoutData(workoutId, data, (success, message, surveyData)=>{
+      if(success){
+        callback(false, message, surveyData);
       }else{
-        callback(true, surveyData)
+        callback(true, { message: "Error inserting user workout" });
       }
     })
   }
 
   sendNewWorkoutData(workoutData, callback){
-    this.dataMod.sendNewWorkoutData(workoutData, (error, surveyData)=>{
-      if(error){
-        console.log("Error sending workout data: ", error);
-        callback(false, {message:"Error sending workout data"});
+    this.dataMod.sendNewWorkoutData(workoutData, (success, message, surveyData)=>{
+      if(success){
+        callback(false, message, surveyData);
       }else{
-        callback(true, surveyData)
+        callback(true, { message: "Error inserting user workout" });
       }
     })
   }
@@ -587,12 +566,11 @@ export default class LogicService {
   }
 
   sendNewMessage(data, callback){
-    this.dataMod.sendNewMessage(data, (error, surveyData)=>{
-      if(error){
-        console.log("Error sending chat data: ", error);
-        callback(false, {message:"Error sending chat data"});
+    this.dataMod.sendNewMessage(data, (success,message, surveyData)=>{
+      if(success){
+        callback(false, message, surveyData);
       }else{
-        callback(true, surveyData)
+        callback(true, { message: "Error sending message" });
       }
     })
   }

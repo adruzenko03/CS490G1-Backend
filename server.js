@@ -795,6 +795,19 @@ app.post('/updateExercise/:exercise_id/:actionType', (req, res) => {
   });
 });
 
+app.get('/getlast5Workouts/:clientId', (req, res) => {
+    const { clientId } = req.params;
+    logMod.getlast5(clientId, (err, top5workouts) => {
+        if (err) {
+          console.error("Server error:", err);  
+          res.status(500).send('Error fetching workout log');
+        } else {
+            res.status(200).json(top5workouts);
+            console.log("Server.js", top5workouts);
+        }
+    });
+});
+
 app.listen(PORT, () => {
     console.log("Listening on port " + PORT);
 })

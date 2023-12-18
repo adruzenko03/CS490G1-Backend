@@ -1072,7 +1072,45 @@ export default class DatabaseService {
         callback(false, err.message, null);
       } else {
         console.log("Results from database.js: ", results);
-        callback(true, 'Successful addition of exercise');
+        callback(true, results);
+      }
+    });
+  }
+
+  fetchtop5(clientId, callback) {
+    /*const query = `
+    SELECT * 
+    FROM reps 
+    WHERE user_id = 199 AND entry_date >= CURDATE() - INTERVAL 5 DAY
+    ORDER BY entry_date DESC;
+`;*/
+    /*const query = `
+    SELECT reps.*, we.workout_id, w.workout_name
+    FROM reps
+    INNER JOIN workout_exercises we ON reps.workout_exercise_id = we.workout_exercise_id
+    INNER JOIN workouts w ON we.workout_id = w.workout_id
+    WHERE reps.user_id = ? AND reps.entry_date >= CURDATE() - INTERVAL 5 DAY
+    ORDER BY reps.entry_date DESC;
+    `;*/
+    const query = `
+    SELECT reps.*, we.workout_id, w.workout_name, e.exercise_name
+    FROM reps
+    INNER JOIN workout_exercises we ON reps.workout_exercise_id = we.workout_exercise_id
+    INNER JOIN workouts w ON we.workout_id = w.workout_id
+    INNER JOIN exercises e ON we.exercise_id = e.exercise_id
+    WHERE reps.user_id = ? AND reps.entry_date >= CURDATE() - INTERVAL 5 DAY
+    ORDER BY reps.entry_date DESC;
+`;
+
+
+
+    this.connection.query(query, [clientId], (err, results) => {
+      if (err) {
+        console.error("Error fetching top 5 workouts ", err);
+        callback(false, null);
+      } else {
+        console.log("Results from database.js: in fetchtop5 ", results);
+        callback(null, results);
       }
     });
   }

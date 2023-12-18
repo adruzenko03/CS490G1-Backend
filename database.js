@@ -20,6 +20,15 @@ export default class DatabaseService {
         return;
       }
       console.log("Database connection established");
+      setInterval(()=>{this.connection.query('select * from goals',(err) => {
+        if (err) {
+          console.error("Error connecting to the database:", err);
+          return;
+        }
+        console.log("Database connection pinged");
+        }); 
+        
+      }, 100000);
       }); 
       
     
@@ -142,11 +151,25 @@ export default class DatabaseService {
       if (err) {
         callback(false, err.message);
       } else {
-        // If the insert is successful, send back a success message.
-        callback(true, "Survey data inserted successfully", surveyData);
+        
+        const query = `INSERT INTO coach_status (coach_id, status) VALUES (?, 'pending')`; //change to accept last param too
+        const values = [
+          surveyData.userID,
+         ];
+    
+        this.connection.query(query, values, (err, results) => {
+          if (err) {
+            console.log
+            callback(false, err.message);
+          } else {
+            // If the insert is successful, send back a success message.
+            callback(true, "Survey data inserted successfully", surveyData);
+          }
+        });
       }
     });
   }
+
   insertClientSurvey(surveyData, callback) {
     const query = `INSERT INTO survey (user_id, fitness_level, diet, weekly_exercise, goal_id) VALUES (?, ?, ?, ?, ?)`; //change to accept last param too
     console.log("What will be inserted into survey table ", surveyData);
@@ -199,8 +222,7 @@ export default class DatabaseService {
 
   getExercises(callback) {
     const query =
-      "SELECT exercises.exercise_name,exercises.muscle, equipment.equipment_name, exercises.steps FROM exercises INNER JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id INNER JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id";
-
+      "SELECT exercises.exercise_name, exercises.muscle, GROUP_CONCAT(equipment.equipment_name SEPARATOR ', ') AS equipment_names, exercises.steps FROM exercises INNER JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id INNER JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY exercises.exercise_id;";
     this.connection.query(query, (error, results, fields) => {
       if (error) {
         return callback(error);
@@ -936,7 +958,6 @@ export default class DatabaseService {
   getExercisesList(callback) {
     const query =
       "SELECT * FROM fitness.exercises";
-
     this.connection.query(query, (error, results, fields) => {
       if (error) {
         return callback(error);

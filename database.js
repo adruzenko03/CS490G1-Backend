@@ -905,8 +905,6 @@ export default class DatabaseService {
 
         });
       }
-    });
-  }
 
   // ------------------_----------------–---------------------------------------
 
@@ -1002,7 +1000,7 @@ export default class DatabaseService {
         })
     }
 
-
+    /*
     this.connection.beginTransaction(err => {
       if (err) {
         callback(err);
@@ -1039,7 +1037,7 @@ export default class DatabaseService {
       });
     });
   }
-
+*/
   declineClient(clientId, coachId, callback) {
     const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ? AND coach_id = ?';
     this.connection.query(query, [clientId, coachId], (err, result) => {
@@ -1054,22 +1052,6 @@ export default class DatabaseService {
   }
   // -----------------------------------–---------------------------------------
 
-
-  deleteExercise(workoutId, data, callback) {
-    const query = `DELETE FROM fitness.workout_exercises WHERE workout_id = ? and exercise_id = ?;`
-
-    this.connection.query(query, [workoutId, data.oldExerciseId], (err, results) => {
-      if (err) {
-        console.error("Error deleting from database: ", err);
-        callback(false, err.message, null);
-      } else {
-        console.log("Results from database.js: ", results);
-        callback(true, 'Delete was successful');
-      }
-    })
-  }
-
-  // -----------------------------------–---------------------------------------
 
 
   addNewExercise(workoutId, data, callback) {

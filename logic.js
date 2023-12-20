@@ -646,4 +646,15 @@ export default class LogicService {
       callback('Invalid  action', null);
     }
   }
+
+  updateSurvey(userId, updatedSurveyData, callback){
+    this.dataMod.updateSurveyData(userId, updatedSurveyData, (err, result) => {
+      if(err){
+        callback(err, null);
+      }else{
+        callback(null, result);
+      }
+    });
+  }
+
 }

@@ -808,6 +808,18 @@ app.get('/getlast5Workouts/:clientId', (req, res) => {
     });
 });
 
+app.put('/updateSurvey/:userID', (req, res) =>{
+  const userId = req.params.userID;
+  const updatedSurveyData = req.body;
+  logMod.updateSurvey(userId, updatedSurveyData, (err, result) => {
+    if (err) {
+        res.status(500).send('Error updating survey data');
+    } else {
+        res.status(200).send('Survey data updated successfully');
+    }
+  });
+});
+
 app.listen(PORT, () => {
     console.log("Listening on port " + PORT);
 })

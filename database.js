@@ -1252,6 +1252,19 @@ export default class DatabaseService {
       }
     });
   }
+  updateSurveyData(userId, updatedSurveyData, callback){
+    const query = `UPDATE survey SET fitness_level = ?, diet = ?, weekly_exercise = ?, goal_id = ? WHERE user_id = ?`;
+    const { fitness_level, diet, weekly_exercise, goal_id } = updatedSurveyData;
+
+    this.connection.query(query, [fitness_level, diet, weekly_exercise, goal_id, userId], (err, results) => {
+        if (err) {
+            console.error("Database error:", err);
+            callback(err, null);
+        } else {
+            callback(null, results);
+        }
+    });
+  }
 
 //         this.connection.query(query, [values],  (err, results) => {
 //             if (err) {

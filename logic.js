@@ -11,7 +11,7 @@ export default class LogicService {
       if (res.length == 0)
         callback(false, { message: "Incorrect username or password" });
       else {
-        //res[0]() has user_id, email, password)
+
         this.dataMod.getUserInfo(res[0].user_id, (userInfo) => {
           if (userInfo) {
             callback(true, { user: { ...res, ...userInfo } });

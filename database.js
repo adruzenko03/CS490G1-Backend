@@ -579,7 +579,7 @@ export default class DatabaseService {
 
   getAcceptedCoach(clientId, callback) {
     const query = `SELECT * 
-        FROM fitness.coach_client_connections 
+        FROM coach_client_connections 
         JOIN coach_survey ON coach_survey.user_id = coach_client_connections.coach_id
         JOIN users on users.user_id = coach_client_connections.coach_id
         WHERE coach_client_connections.client_id = ? AND coach_client_connections.status = 'accepted'`

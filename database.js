@@ -61,7 +61,6 @@ export default class DatabaseService {
   }
 
   getUserInfo(userId, callback) {
-    console.log(userId);
     const query = `
           SELECT u.*, cs.status as coach_status
           FROM users u
@@ -1002,6 +1001,7 @@ export default class DatabaseService {
     }
 
     /*
+
     this.connection.beginTransaction(err => {
       if (err) {
         callback(err);
@@ -1039,6 +1039,7 @@ export default class DatabaseService {
     });
   }
 */
+
   declineClient(clientId, coachId, callback) {
     const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ? AND coach_id = ?';
     this.connection.query(query, [clientId, coachId], (err, result) => {
@@ -1188,7 +1189,6 @@ export default class DatabaseService {
                         WHERE coach_client_message.coach_client_id = ?
                         AND users.user_id != ?;`
     this.connection.query(query, [chatId, coachId], (err, results) => {
-      console.log(results)
       if (err) {
         callback(err);
       } else {

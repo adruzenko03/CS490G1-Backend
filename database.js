@@ -563,7 +563,7 @@ export default class DatabaseService {
   //  -------------------------------------------------------------------------
 
   getCoachList(callback) {
-    const query = `SELECT * FROM fitness.coach_survey JOIN users ON coach_survey.user_id = users.user_id;`
+    const query = `SELECT * FROM coach_survey JOIN users ON coach_survey.user_id = users.user_id;`
     this.connection.query(query, (error, results) => {
       if (error) {
         return callback(error);
@@ -595,7 +595,7 @@ export default class DatabaseService {
   //  -------------------------------------------------------------------------
 
   getClientInfo(clientId, callback) {
-    const query = `SELECT * FROM fitness.users 
+    const query = `SELECT * FROM users 
         JOIN survey on survey.user_id = users.user_id
         JOIN goals on goals.goal_id = survey.goal_id
         WHERE users.role = 'client' and users.user_id= ?;`
@@ -614,7 +614,7 @@ export default class DatabaseService {
 
   getPendingCoach(clientId, callback) {
     const query = `SELECT *
-                        FROM fitness.coach_client_connections
+                        FROM coach_client_connections
                         JOIN coach_survey ON coach_survey.user_id = coach_client_connections.coach_id
                         JOIN users on users.user_id = coach_client_connections.coach_id
                         WHERE coach_client_connections.client_id = ? AND coach_client_connections.status = 'pending';
@@ -645,7 +645,7 @@ export default class DatabaseService {
         MAX(steps) AS steps,
         MAX(workouts.last_update) AS last_update
         FROM 
-            fitness.user_workouts 
+            user_workouts 
         JOIN 
             workouts ON user_workouts.workout_id = workouts.workout_id
         JOIN 
@@ -706,7 +706,7 @@ export default class DatabaseService {
 
 
   getExerciseCount(workoutId, callback) {
-    const query = `SELECT COUNT(*) AS exercise_count FROM fitness.workout_exercises WHERE workout_id = ${workoutId};`
+    const query = `SELECT COUNT(*) AS exercise_count FROM workout_exercises WHERE workout_id = ${workoutId};`
     this.connection.query(query, (err, results) => {
       if (err) {
         callback(err);
@@ -721,7 +721,7 @@ export default class DatabaseService {
 
 
   deleteCoachRequest(requestId, callback) {
-    const query = `DELETE FROM fitness.coach_client_connections WHERE coach_client_id = (?);`
+    const query = `DELETE FROM coach_client_connections WHERE coach_client_id = (?);`
 
         this.connection.query(query, [requestId.requestId], (err, results)=>{
             if(err){
@@ -738,7 +738,7 @@ export default class DatabaseService {
 
 
   acceptClientRequest(connectionId, callback) {
-    const query = `UPDATE fitness.coach_client_connections
+    const query = `UPDATE coach_client_connections
                         SET status = 'accepted' 
                         WHERE coach_client_id = ?;
 
@@ -760,7 +760,7 @@ export default class DatabaseService {
 
     deleteCurrentCoach(connectionId, callback){
         this.connection.query(
-            `DELETE FROM fitness.coach_client_connections WHERE status='accepted' AND coach_client_id = ${connectionId};`,
+            `DELETE FROM coach_client_connections WHERE status='accepted' AND coach_client_id = ${connectionId};`,
             (err1) => {
                 if (err1) {
                     callback(err1);
@@ -775,7 +775,7 @@ export default class DatabaseService {
 
   deleteCurrentCoach(connectionId, callback) {
     this.connection.query(
-      `DELETE FROM fitness.coach_client_connections WHERE status='accepted' AND coach_client_id = ${connectionId};`,
+      `DELETE FROM coach_client_connections WHERE status='accepted' AND coach_client_id = ${connectionId};`,
       (err1) => {
         if (err1) {
           callback(err1);
@@ -791,7 +791,7 @@ export default class DatabaseService {
 
   getPendingClientRequests(coachId, callback) {
     const query = `SELECT * 
-        FROM fitness.coach_client_connections AS ccc
+        FROM coach_client_connections AS ccc
         JOIN users ON users.user_id = ccc.client_id 
         JOIN survey ON survey.user_id = users.user_id
         JOIN goals ON goals.goal_id = survey.goal_id
@@ -813,7 +813,7 @@ export default class DatabaseService {
   /*Glen's Code*/
   getAcceptedClients2(coachId, callback) {
     const query = `SELECT * 
-        FROM fitness.coach_client_connections AS ccc
+        FROM coach_client_connections AS ccc
         JOIN users ON users.user_id = ccc.client_id 
         JOIN survey ON survey.user_id = users.user_id
         JOIN goals ON goals.goal_id = survey.goal_id
@@ -832,7 +832,7 @@ export default class DatabaseService {
   //  -------------------------------------------------------------------------
 
   declineClientRequest(connectionId, callback) {
-    const query = `UPDATE fitness.coach_client_connections
+    const query = `UPDATE coach_client_connections
                         SET status = 'declined' 
                         WHERE coach_client_id = ?;`
 
@@ -853,7 +853,7 @@ export default class DatabaseService {
 
 
   deleteClient(connectionId, callback) {
-    const query = `DELETE FROM fitness.coach_client_connections WHERE coach_client_id = (?);`
+    const query = `DELETE FROM coach_client_connections WHERE coach_client_id = (?);`
         this.connection.query(query, [connectionId.connectionId], (err, results)=>{
             if(err){
                 console.error("Error deleting from database: ", err);
@@ -872,7 +872,7 @@ export default class DatabaseService {
 
   sendWorkoutData(workoutId, data, callback) {
 
-    const query1 = `UPDATE fitness.workouts 
+    const query1 = `UPDATE workouts 
                         SET workout_name = ?, goal_id = ?, difficulty = ? 
                         WHERE workout_id = ?`;
 
@@ -888,7 +888,7 @@ export default class DatabaseService {
                 const new_muscle_id = data.editedItems.muscle_id;
                 const old_muscle_id = data.oldMuscleId;
                 // Second query for updating workout_muscle_groups
-                const query2 = `UPDATE fitness.workout_muscle_groups 
+                const query2 = `UPDATE workout_muscle_groups 
                                 SET muscle_id = ?
                                 WHERE workout_id = ? AND muscle_id = ?`;
                 
@@ -936,7 +936,7 @@ export default class DatabaseService {
 
 
   getAllExercises(workoutId, callback) {
-    const query = `SELECT * FROM fitness.workout_exercises 
+    const query = `SELECT * FROM workout_exercises 
                         JOIN exercises on exercises.exercise_id = workout_exercises.exercise_id
                         WHERE workout_id = ${workoutId};`
     this.connection.query(query, (err, results, fields) => {
@@ -955,7 +955,7 @@ export default class DatabaseService {
 
   getExercisesList(callback) {
     const query =
-      "SELECT * FROM fitness.exercises";
+      "SELECT * FROM exercises";
     this.connection.query(query, (error, results, fields) => {
       if (error) {
         return callback(error);
@@ -968,7 +968,7 @@ export default class DatabaseService {
 
 
   changeExercise(workoutId, data, callback) {
-    const query = `UPDATE fitness.workout_exercises
+    const query = `UPDATE workout_exercises
                         SET exercise_id = ?
                         WHERE workout_id = ? and exercise_id = ?;`
         this.connection.query(query, [data.selectedId, workoutId, data.oldExerciseId], (err, results)=>{
@@ -987,7 +987,7 @@ export default class DatabaseService {
 
     
     deleteExercise(workoutId, data, callback){
-        const query = `DELETE FROM fitness.workout_exercises WHERE workout_id = ? and exercise_id = ?;`
+        const query = `DELETE FROM workout_exercises WHERE workout_id = ? and exercise_id = ?;`
 
         this.connection.query(query, [workoutId, data.oldExerciseId], (err, results)=>{
             if(err){

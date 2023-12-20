@@ -7,9 +7,11 @@ export default class LogicService {
 
   login(username, password, callback) {
     this.dataMod.login(username, password, (res) => {
+      console.log(res);
       if (res.length == 0)
         callback(false, { message: "Incorrect username or password" });
       else {
+
         this.dataMod.getUserInfo(res[0].user_id, (userInfo) => {
           if (userInfo) {
             callback(true, { user: { ...res, ...userInfo } });
@@ -644,4 +646,15 @@ export default class LogicService {
       callback('Invalid  action', null);
     }
   }
+
+  updateSurvey(userId, updatedSurveyData, callback){
+    this.dataMod.updateSurveyData(userId, updatedSurveyData, (err, result) => {
+      if(err){
+        callback(err, null);
+      }else{
+        callback(null, result);
+      }
+    });
+  }
+
 }

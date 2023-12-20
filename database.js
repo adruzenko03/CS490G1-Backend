@@ -46,14 +46,14 @@ export default class DatabaseService {
 
   login(username, password, callback) {
     this.connection.query(
-      `SELECT * FROM user_auth WHERE email='${username}' and password='${password}'`,
+      `SELECT * FROM user_auth WHERE email='${username}' AND password='${password}'`,
       (err, res) => {
         if (err) {
           console.error("Database error:", err);
           callback([]);
           return;
         }
-        const userData = res[0];
+        const userData = res;
         console.log("Database response!:", userData);
         callback(userData);
       }
@@ -61,6 +61,7 @@ export default class DatabaseService {
   }
 
   getUserInfo(userId, callback) {
+    console.log("THIS USERIDPKMK", userId);
     const query = `
           SELECT u.*, cs.status as coach_status
           FROM users u
@@ -68,7 +69,7 @@ export default class DatabaseService {
           WHERE u.user_id = ?
       `;
     //`SELECT * FROM users WHERE user_id='${userId}'`,
-    this.connection.query(query, userId, (err, res) => {
+    this.connection.query(query, [userId], (err, res) => {
       if (err) {
         console.error("Database error:", err);
         callback(null);

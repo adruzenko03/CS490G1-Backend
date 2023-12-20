@@ -459,7 +459,7 @@ export default class DatabaseService {
   }
 
   deactivateExercise(exercise_id, callback) {
-    const query = 'UPDATE exercises SET status = "deactivated" WHERE exercise_id = ?';
+    const query = "UPDATE exercises SET status = 'deactivated' WHERE exercise_id = ?";
 
     this.connection.query(query, [exercise_id], (error, result) => {
       if (error) {

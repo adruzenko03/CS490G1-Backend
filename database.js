@@ -53,7 +53,7 @@ export default class DatabaseService {
           callback([]);
           return;
         }
-        const userData = res[0];
+        const userData = res;
         console.log("Database response!:", userData);
         callback(userData);
       }
@@ -61,6 +61,7 @@ export default class DatabaseService {
   }
 
   getUserInfo(userId, callback) {
+    console.log(userId);
     const query = `
           SELECT u.*, cs.status as coach_status
           FROM users u
@@ -68,7 +69,7 @@ export default class DatabaseService {
           WHERE u.user_id = ?
       `;
     //`SELECT * FROM users WHERE user_id='${userId}'`,
-    this.connection.query(query, userId, (err, res) => {
+    this.connection.query(query, [userId], (err, res) => {
       if (err) {
         console.error("Database error:", err);
         callback(null);
@@ -1187,6 +1188,7 @@ export default class DatabaseService {
                         WHERE coach_client_message.coach_client_id = ?
                         AND users.user_id != ?;`
     this.connection.query(query, [chatId, coachId], (err, results) => {
+      console.log(results)
       if (err) {
         callback(err);
       } else {

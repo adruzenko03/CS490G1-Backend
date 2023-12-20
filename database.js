@@ -1193,7 +1193,7 @@ export default class DatabaseService {
       if (err) {
         callback(err);
       } else {
-        // console.log(results);
+        console.log(results);
         callback(null, results)
       }
     })

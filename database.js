@@ -825,7 +825,7 @@ export default class DatabaseService {
                 // console.log(results);
                 callback(null, results);
             }
-        })
+        });
     }
 
 
@@ -845,7 +845,7 @@ export default class DatabaseService {
                 // console.log("Results from database.js: ", results);
                 callback(true, 'Request acceptance was successful.');
             }
-        })
+        });
     }
 
 
@@ -854,21 +854,17 @@ export default class DatabaseService {
 
   deleteClient(connectionId, callback) {
     const query = `DELETE FROM fitness.coach_client_connections WHERE coach_client_id = (?);`
-        this.connection.query(query, [connectionId.connectionId], (err, results)=>{
-            if(err){
-                console.error("Error deleting from database: ", err);
-                callback(false, err.message, null);
-            }else{
-                // console.log("Results from database.js: ", results);
-                callback(true, 'Delete was successful');
-            }
-        })
-    }
-
-
+      this.connection.query(query, [connectionId.connectionId], (err, results)=>{
+        if(err){
+          console.error("Error deleting from database: ", err);  
+          callback(false, err.message, null);
+        }else{
+          // console.log("Results from database.js: ", results);
+         callback(true, 'Delete was successful');
+        }
+      });
+  }
   // ------------------_----------------–---------------------------------------
-
-
 
   sendWorkoutData(workoutId, data, callback) {
 
@@ -901,13 +897,9 @@ export default class DatabaseService {
                         callback(true, 'Request acceptance was successful.');
                     }
                 });
-            }
-
-        });
-      }
+              }
     });
   }
-
   // ------------------_----------------–---------------------------------------
 
 
@@ -999,22 +991,19 @@ export default class DatabaseService {
                 // console.log("Results from database.js: ", results);
                 callback(true, 'Delete was successful');
             }
-        })
-    }
+        });
+        this.connection.beginTransaction(err => {
+          if (err) {
+            callback(err);
+            return;
+          }
 
-
-    this.connection.beginTransaction(err => {
-      if (err) {
-        callback(err);
-        return;
-      }
-
-      this.connection.query(query, [clientId, coachId], (err, acceptresult) => {
-        if (err) {
-          return this.connection.rollback(() => {
+        this.connection.query(query, [clientId, coachId], (err, acceptresult) => {
+          if (err) {
+            return this.connection.rollback(() => {
             callback(err);
           });
-        }
+          }
 
         this.connection.query(declineothers, [clientId, coachId], (err, declineresult) => {
           if (err) {

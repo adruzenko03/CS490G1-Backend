@@ -1,7 +1,7 @@
 {
   "name": "cs490g1-backend",
   "version": "1.0.0",
-  "description": "",
+  "description":"",
   "main": "index.js",
   "type": "module",
   "scripts": {

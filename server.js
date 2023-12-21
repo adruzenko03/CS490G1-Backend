@@ -414,15 +414,16 @@ app.post('/declineClient', (req, res) => {
 
 // ------------------_----------------–---------------------------------------
 
-app.put('/acceptClientRequest/:connectionId', (req, res)=>{
-    const connectionId = req.params.connectionId;
-    logMod.acceptClientRequest(connectionId, (success, message)=>{
-        if(success){
-            res.status(200).json({ ok: true, message: 'Request successfully accepted.' });
-        }else{
-            res.status(400).json({ ok: false, message });
-        }
-    })
+app.put('/acceptClientRequest', (req, res)=>{
+  // const {clientId, coachId} = req.body;
+  const {connectionId} = req.body;
+  logMod.acceptClientRequest(connectionId, (success, message)=>{
+      if(success){
+          res.status(200).json({ ok: true, message: 'Request successfully accepted.' });
+      }else{
+          res.status(400).json({ ok: false, message });
+      }
+  })
 })
 
 

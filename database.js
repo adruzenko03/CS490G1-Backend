@@ -1048,7 +1048,7 @@ export default class DatabaseService {
         console.error("Error inserting into database: ", err);
         callback(false, err.message);
       } else {
-        console.log("Results from database.js: ", results);
+        console.log("Results from database.js: ", result);
         callback(true, 'Successful addition of exercise');
       }
     });

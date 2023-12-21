@@ -1042,7 +1042,7 @@ export default class DatabaseService {
 */
 
   declineClient(clientId, coachId, callback) {
-    const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ? AND coach_id = ?';
+    const query = "UPDATE coach_client_connections SET status = 'declined' WHERE client_id = ? AND coach_id = ?";
     this.connection.query(query, [clientId, coachId], (err, result) => {
       if (err) {
         console.error("Error inserting into database: ", err);

@@ -412,7 +412,7 @@ export default class DatabaseService {
   }
 
   declineCoach(coach_id, callback) {
-    const query = 'UPDATE coach_status SET status = "declined" WHERE coach_id = ?; UPDATE users SET role = "client" WHERE user_id = ?;';
+    const query = "UPDATE coach_status SET status = 'declined' WHERE coach_id = ?; UPDATE users SET role = 'client' WHERE user_id = ?;";
 
     this.connection.query(query, [coach_id, coach_id], (error, result) => {
       if (error) {

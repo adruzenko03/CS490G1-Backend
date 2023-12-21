@@ -223,7 +223,7 @@ export default class DatabaseService {
 
   getExercises(callback) {
     const query =
-      "SELECT exercises.exercise_name, exercises.muscle, GROUP_CONCAT(equipment.equipment_name SEPARATOR ', ') AS equipment_names, exercises.steps FROM exercises INNER JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id INNER JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY exercises.exercise_id;";
+      "SELECT exercises.exercise_name, exercises.muscle, GROUP_CONCAT(equipment.equipment_name SEPARATOR ', ') AS equipment_names, exercises.steps FROM exercises INNER JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id INNER JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id WHERE status='activated' GROUP BY exercises.exercise_id;";
     this.connection.query(query, (error, results, fields) => {
       if (error) {
         return callback(error);
@@ -412,7 +412,7 @@ export default class DatabaseService {
   }
 
   declineCoach(coach_id, callback) {
-    const query = 'UPDATE coach_status SET status = "declined" WHERE coach_id = ?; UPDATE users SET role = "client" WHERE user_id = ?;';
+    const query = "UPDATE coach_status SET status = 'declined' WHERE coach_id = ?; UPDATE users SET role = 'client' WHERE user_id = ?;";
 
     this.connection.query(query, [coach_id, coach_id], (error, result) => {
       if (error) {
@@ -424,7 +424,7 @@ export default class DatabaseService {
   }
 
   getExerciseList(callback) {
-    const query = 'SELECT exercises.muscle, exercises.status, exercises.exercise_id, exercises.exercise_name, GROUP_CONCAT(DISTINCT equipment.equipment_name) AS equipment_list, exercises.steps FROM exercises JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY exercises.exercise_id, exercises.exercise_name, exercises.steps ORDER BY exercises.last_update DESC';
+    const query = "SELECT exercises.muscle, exercises.status, exercises.exercise_id, exercises.exercise_name, GROUP_CONCAT(DISTINCT equipment.equipment_name) AS equipment_list, exercises.steps FROM exercises JOIN exercise_equipment ON exercises.exercise_id = exercise_equipment.exercise_id JOIN equipment ON exercise_equipment.equipment_id = equipment.equipment_id GROUP BY exercises.exercise_id, exercises.exercise_name, exercises.steps ORDER BY exercises.last_update DESC";
     this.connection.query(query, (error, results, fields) => {
       if (error) {
 
@@ -707,7 +707,7 @@ export default class DatabaseService {
 
 
   getExerciseCount(workoutId, callback) {
-    const query = `SELECT COUNT(*) AS exercise_count FROM workout_exercises WHERE workout_id = ${workoutId};`
+    const query = `SELECT COUNT(*) AS exercise_count FROM workout_exercises WHERE workout_id = ${workoutId} and status='activated';`
     this.connection.query(query, (err, results) => {
       if (err) {
         callback(err);
@@ -954,7 +954,7 @@ export default class DatabaseService {
 
   getExercisesList(callback) {
     const query =
-      "SELECT * FROM exercises";
+      "SELECT * FROM exercises where status='activated'";
     this.connection.query(query, (error, results, fields) => {
       if (error) {
         return callback(error);
@@ -1042,13 +1042,13 @@ export default class DatabaseService {
 */
 
   declineClient(clientId, coachId, callback) {
-    const query = 'UPDATE coach_client_connections SET status = "declined" WHERE client_id = ? AND coach_id = ?';
+    const query = "UPDATE coach_client_connections SET status = 'declined' WHERE client_id = ? AND coach_id = ?";
     this.connection.query(query, [clientId, coachId], (err, result) => {
       if (err) {
         console.error("Error inserting into database: ", err);
         callback(false, err.message);
       } else {
-        console.log("Results from database.js: ", results);
+        console.log("Results from database.js: ", result);
         callback(true, 'Successful addition of exercise');
       }
     });
